@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "dirt" #"default" # "air", "aqua", "contrast", "dark"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Site Title"
+title                    : "Sam Pike - Game Dev"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Sam Pike"
@@ -81,11 +81,7 @@ baidu_site_verification  :
 
 # Social Sharing
 twitter:
-  username               : pike_develops
-facebook:
-  username               :
-  app_id                 :
-  publisher              :
+  username               : spike_develops
 og_image                 : # Open Graph/Twitter default site image
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
