@@ -81,7 +81,7 @@ baidu_site_verification  :
 
 # Social Sharing
 twitter:
-  username               : spike_develops
+  username               : pike_develops
 facebook:
   username               :
   app_id                 :
@@ -106,9 +106,9 @@ analytics:
 author:
   name             : "Sam Pike"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Game Developer"
+  bio              : "Trying to write down stuff because thats good"
   location         : "Milwaukee, WI"
-  email            :
+  email            : 
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -118,7 +118,10 @@ author:
       # url: "https://your-website.com"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/@spike-develops"
+      url: "https://twitter.com/@spike_develops"
+    - label: "Mastodon"
+      icon: "fab fa-fw fa-mastodon"
+      url: "https://mastodon.gamedev.place/@SpikeDevelops"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       # url: "https://facebook.com/"
@@ -166,7 +169,7 @@ exclude:
   - .sass-cache
   - assets/js/plugins
   - assets/js/_main.js
-  - assets/js/vendor
+  - assets/js/vendor    
   - Capfile
   - CHANGELOG
   - config
