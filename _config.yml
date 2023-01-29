@@ -152,6 +152,7 @@ footer:
 
 
 # Reading Files
+# this is imporant from -sam
 include:
   - .htaccess
   - _pages
@@ -216,7 +217,7 @@ sass:
 
 
 # Outputting
-permalink: /:categories/:title/
+
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -275,12 +276,15 @@ compress_html:
   ignore:
     envs: development
 
+collections:
+  demos:
+    output: true
 
 # Defaults
 defaults:
   # _posts
   - scope:
-      path: ""
+      path: ""  
       type: posts
     values:
       layout: single
@@ -289,3 +293,9 @@ defaults:
       comments: # true
       share: true
       related: true
+  # _demos
+  - scope:
+      type: demos
+    values:
+      layout: splash
+      food: apple
