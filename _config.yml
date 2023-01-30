@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "dirt" #"default" # "air", "aqua", "contrast", "dark"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Sam Pike - Game Dev"
+title                    : "Sam Pike - Game Developer"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Sam Pike"
@@ -102,38 +102,29 @@ analytics:
 author:
   name             : "Sam Pike"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Trying to write down stuff because thats good"
+  bio              : "Game Developer working on something pretty spooky"
   location         : "Milwaukee, WI"
   email            : 
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      # url: "https://your-website.com"
+      url: "mailto:spikedevelops@gmail.com"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       url: "https://twitter.com/@spike_develops"
     - label: "Mastodon"
       icon: "fab fa-fw fa-mastodon"
       url: "https://mastodon.gamedev.place/@SpikeDevelops"
-    - label: "Facebook"
-      icon: "fab fa-fw fa-facebook-square"
-      # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url: "https://github.com/"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      # url: "https://instagram.com/"
+      url: "https://github.com/spike-develops"
 
 # Site Footer
 footer:
   links:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      # url:
+      url: "https://twitter.com/@spike_develops"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       # url:
@@ -153,6 +144,8 @@ footer:
 
 # Reading Files
 # this is imporant from -sam
+# also less so. if you include things here it may cause things to jankily show up twice
+# which i learned the hard way after long time trying to find bug
 include:
   - .htaccess
   - _pages
