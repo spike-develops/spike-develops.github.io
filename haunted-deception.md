@@ -2,6 +2,7 @@
 layout: single
 author_profile: true
 title: "Haunted Deception"
+permalink:  /haunted-deception/
 ---
 
 Haunted Deception is a 5-8 player online social deception game that bends the rules of what players can see, do, and hear... In life, and in death!
