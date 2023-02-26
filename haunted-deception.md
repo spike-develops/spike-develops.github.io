@@ -19,7 +19,7 @@ Searchables replace the "task" system from Among Us, having players look/listen 
 Mirrors replace "vents" from Among Us, allowing traitors to secretly navigate around the map, and "possess" things and other players.
 {% include video id="1qELC1sUOIoqp-y8psbUEonEXGhgOKoLN" provider="google-drive" %}
 <hr class="rounded">
-Some live-game footage (from an early 2022 build) showing some online gameplay
+Some live-game footage (from an early 2022 build) showing some online gameplay and native proximity VOIP
 {% include video id="1ay7nELyNuoiXjZe9tkh9tI7Tq91lraWO" provider="google-drive" %}
 
 Also check out my [**Twitter**](https://twitter.com/spike_develops) for live updates!
