@@ -1,0 +1,60 @@
+Started with Mirror-Networking in unity. 
+
+Basic thoughts are that it and other networking solutions like it can and would work, but they start to have issues when/if you might want to have objects that are regularly able to change their sources of truth. 
+
+Possession in cop prevented this
+
+The first and argubably most important thing to figure out is *What are my games networking needs* This can be the difference maker that prevents (or forces) you to rip up your netcode halfway through development (which ended up happening with COP)
+
+COP's networking requirments
+small scale lobby
+
+
+Types of requirements
+
+lobby size 2-4, 5-10 etc
+- this is one of the most important distinctions. The smaller the needed lobby size, the easier it is to forgo more complex architecture
+
+Primary mode of interaction.
+If your game is strictly turn based, you might have the luxury of sending a single
+- turn based, command based (RTS), precise or imprecise real time
+
+Cooperative vs Competitive
+If you only ever have cooperative combat against non player entities, you might be able to get away with less complex netcode than if you have PvP combat. 
+
+Entity Ownership
+Single Exclusive: players have exclusive control over a single player entity for an entire session
+Multiple Exclusive: players have exclusive control over one or more entities at a time, and may stop/start control. 
+Shared Ownership: This is the case for COP, 
+
+Single or Multiple: do players control a single player entity, or start/stop control over multiple entities ala an RTS like Age of Empires
+
+(this is more imporantant to make decisions than the distinction between single or multiple)
+Exclusive or Shared: Do players always have exclusive control over the entities they own, or are there points where they might be affected or controlled by input of other players? I would argue that any competitive PvP games with crowd control slots into Shared from a complexity standpoint. Something about collision?
+
+From my experience prebuilt systems like Mirror don't handle shared ownership well
+
+
+
+
+
+Since this is a guide about how COP networking works, blah blah
+
+COP's requirements were 5-8 player lobbies, and precise real time action. 
+
+
+
+
+
+
+Single, Shared, real-time, 
+
+//*****
+today is a new day. it's a lovely Day. 
+
+Command Frame
+
+You have to be careful with these buffer speed messages though, since it takes the full RTT time for the server to start receiving messages that have been adjusted.
+
+
+You can't just have the client continue adjusting any time it receives a packet that says speed up, that'd be fucking stupid as shti

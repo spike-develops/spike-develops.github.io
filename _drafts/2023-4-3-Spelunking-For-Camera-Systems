@@ -1,0 +1,52 @@
+Im writing this devlog as I do it, so that hopefully it gets finished.
+
+Spelunky has a cool flipping camera effect that doesn't happen that often. Backrooms in spelunky, blah blah
+
+For the life of me I couldn't find any descriptions of how it might be achieved.
+
+I also 
+
+First step is getting a camera disolve effect. Since Cinemachine's workflow involves a single real camera/brain being aimed and positioned by various virtual caemeras, to get a proper disolve effect isn't as adding another vCam and calling it a day. While the disolve is happening, we'll need to render both places at once until the trainsition is complete. 
+
+https://forum.unity.com/threads/is-it-possible-for-a-blend-to-interpolate-between-images-instead-of-position.541865/#post-3573211 
+
+There are a few ways to go about this, but I opted to use some of the techiques described in this thread. The jist is that we'll create a second camera that is only used during the transition, and exclusivly renders to a render texture that we create.
+
+Then, we create a new virtualCamera and add a "storyboard" extension to it. Storyboards overlay a texture on top of whatever the vCam is rendering, and are great for quick and dirty fades to black/white, but they really start shining when used in tandem with Render Textures. 
+
+When we plop in the render texture from earlier, all of a sudden we have a virtual camera that the main camera can transition to, that really just displays whatever our TransitionCamera is looking at. nifty.
+
+The other really awesome thing is that any sort of transition between this new storyboardVCam will natuarly fade in/out the storyboard render texture without extra overhead. pog.
+
+At this point, we *almost* have a working disolve. The Snag we hit though, is the fact that once we transition to the StoryboardCam, we have to find a way to get back to a "real" camera, (we have to find a way to hide a cut)
+
+Position the secondCamera (the one that is rendering to the render texture that the storyboardCam is displaying) at the same place as the old camera (the one we're starting from), and cut immediatly to the storyboard camera. Now, all we need to do is fade from the storyboardVCam to whatever other VCam we want to end at. Great! we have a disolve!
+
+But of course, this is a tut about the spelunky effect, and it's cool because it doesn't just disolve, it also trucks into and out of the transition room to really sell the spatial change. 
+
+To get that working, we'll need to complicate things a little bit.
+First, and easiest, we'll want to change how we position the storyboardVCam. This won't change how the storyboard render texture looks at all, but it will change how the transition to the new room looks. Instead of having the storyboardVCam match the position and orthographic size of the new camera exactly, we'll slightly tweek the ortho size to be slightly bigger or smaller than the end camera. 
+
+AFter this we'll have a halfway transition that doesn't look great, so we need to get the other side working. 
+
+
+*have we said if they should use brain/vcam here? should probably start with "create brain and a single vCam, and also explain the culling layer wierd thing, to make sure that the vCams stay correct*
+
+Now we'll finaly go back to the Transition Camera Brain system. We'll add a new VCAm (making sure to set the layer to ___) The goal here is to create a similar movement that the storyboardVCam -> real cam has, except all within the render texture that's displayed on the storyboard cam. 
+
+We can just have the start camera here start at the old cameras ortho size, and then set the exit to the same ratio that the other camera has and things would work, but we can also help hide the cut by jumping slightly "ahead" IE if the old cameras ortho was 3.5, and we're "pushing in" instead of setting start to 3.5, and end to 1.5, we could set start to 3.25, and end to 1.25, "jumping" ahead. This really helps hide the cut between the real camera to the render Camera, and gives some extra punch to the transition. 
+
+We can also do some cool stuff to the render texture -add pixialtion to the transition, different post processing, etc.
+
+
+
+
+
+
+
+Run into a snag where State.Lens ortho is 10, but the vCam is clearly supposed to be 3.75. Its because I never gave enough time for the camera to update before disabling. So I either need to swap how i do that kind of thing, or find a way to force the final enter cam to evaluate itself right away.
+
+
+
+
+Ran into another snag where pixel perfect math gets in the way of doing a one-to-one transistion, and instead it veered off (I made a trello card about it)
