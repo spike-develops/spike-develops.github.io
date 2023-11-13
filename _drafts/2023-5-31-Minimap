@@ -1,0 +1,15 @@
+Trying out stuff for a minimap! 
+
+Ive got a separate camera that is following the main camera, but its using a render texture
+
+
+Both cameras
+
+
+IM CUTTING to the render camera, which is doing the move from the room cam to the minimap camera.
+54x96
+
+It might be that trying to use the storyboard isn't the play. IE find a different way to show that render texture
+
+
+I tried controlling tilemap color from separate Tweens, and syncing them up by using the remainder of Time.time, but it really didn't work. I mighta been doing it wrong? but gonna try something else.
