@@ -5,7 +5,7 @@ title: "Cult of Personality"
 permalink:  /cult-of-personality/
 ---
 
-[**Cult of Personality's Steam Page is now live!**](https://store.steampowered.com/app/1699290/Cult_of_Personality/)
+[**Cult of Personality is Out NOW on Steam**](https://store.steampowered.com/app/1699290/Cult_of_Personality/)
 
 Cult of Personality is a 5-8 player online social deception game that bends the rules of what players can see, do, and hear... In life, and in death!
 

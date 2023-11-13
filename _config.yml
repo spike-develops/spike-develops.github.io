@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "dirt" #"default" # "air", "aqua", "contrast", "dark"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Sam Pike - Game Developer"
+title                    : "Sam Pike - Network and Gameplay Engineer"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Sam Pike"
@@ -102,7 +102,7 @@ analytics:
 author:
   name             : "Sam Pike"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Game Developer working on something pretty spooky"
+  bio              : "Network and gameplay engineer on Cult of Personality"
   location         : "Milwaukee, WI"
   email            : 
   links:
