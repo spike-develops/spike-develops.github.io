@@ -28,7 +28,7 @@ teaser                   : # path of fallback teaser image, e.g. "/assets/images
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
-words_per_minute         : 170
+words_per_minute         : 200
 comments:
   provider               : # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   disqus:
@@ -109,12 +109,15 @@ author:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:sam17pike@gmail.com"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/sam-pike-990719197/"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       url: "https://twitter.com/@spike_develops"
-    - label: "Mastodon"
-      icon: "fab fa-fw fa-mastodon"
-      url: "https://mastodon.gamedev.place/@SpikeDevelops"
+#    - label: "Mastodon"
+#      icon: "fab fa-fw fa-mastodon"
+#      url: "https://mastodon.gamedev.place/@SpikeDevelops"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/spike-develops"
@@ -125,6 +128,9 @@ footer:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       url: "https://twitter.com/@spike_develops"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/sam-pike-990719197/"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       # url:
@@ -274,6 +280,7 @@ collections:
     output: true
 
 # Defaults
+#NOTE THERE ARE SEPARATE DEFAULTS FOR DEMO and POSTS currently
 defaults:
   # _posts
   - scope:
