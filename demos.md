@@ -1,5 +1,5 @@
 ---
-title: Game Jams
+title: Other Projects
 layout: collection
 permalink: /demos/
 collection: demos

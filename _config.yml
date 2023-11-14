@@ -16,9 +16,9 @@ minimal_mistakes_skin    : "dark" #"default" # "air", "aqua", "contrast", "dark"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Sam Pike - Network and Gameplay Engineer"
+title                    : "Sam Pike"
 title_separator          : "-"
-subtitle                 : # site tagline that appears below site title in masthead
+subtitle                 : Network and Gameplay Engineer
 name                     : "Sam Pike"
 description              : "Portfolio Site"
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
@@ -28,7 +28,7 @@ teaser                   : # path of fallback teaser image, e.g. "/assets/images
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
-words_per_minute         : 200
+words_per_minute         : 170
 comments:
   provider               : # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   disqus:
@@ -102,7 +102,7 @@ analytics:
 author:
   name             : "Sam Pike"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Network and gameplay engineer on Cult of Personality"
+  bio              : "Engineer at Spiked Games - working on Cult of Personality"
   location         : "Milwaukee, WI"
   email            : 
   links:
