@@ -3,9 +3,17 @@ layout: single
 author_profile: true
 title: "Cult of Personality"
 permalink:  /cult-of-personality/
+tagline: "Lead Network and Gameplay Engineer"
+header: 
+ overlay_image: /assets/files/CoP_Library-Hero.jpg  
+ caption: "Capsule Art: [**MeyersIllustration**](https://www.meyersillustration.com/)"
+ actions:
+ - label: "Steam Page"
+   url: "https://store.steampowered.com/app/1699290/Cult_of_Personality/"
 ---
-
+<!---
 [**Cult of Personality is Out NOW on Steam**](https://store.steampowered.com/app/1699290/Cult_of_Personality/)
+-->
 
 Cult of Personality is a 5-8 player online social deception game that bends the rules of what players can see, do, and hear... In life, and in death!
 
