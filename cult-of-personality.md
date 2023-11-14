@@ -23,5 +23,3 @@ Mirrors replace "vents" from Among Us, allowing traitors to secretly navigate ar
 <hr class="rounded">
 Some live-game footage (from an early 2022 build) showing some online gameplay and native proximity VOIP
 {% include video id="1ay7nELyNuoiXjZe9tkh9tI7Tq91lraWO" provider="google-drive" %}
-
-Also check out my [**Twitter**](https://twitter.com/spike_develops) for live updates!
