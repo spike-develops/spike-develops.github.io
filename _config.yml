@@ -298,6 +298,8 @@ defaults:
   - scope:
       path: "projects" 
     values:
-      layout: splash
+      layout: single
       share: false
       related: false
+      read_time: false
+
