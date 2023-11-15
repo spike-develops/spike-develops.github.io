@@ -1,7 +1,7 @@
 ---
 header:
  teaser: /assets/files/adventOfCode.png
-excerpt: unreal gaming
+excerpt: solving coding puzzles in Unreal
 layout: single
 author_profile: true
 title: "Unreal Advent of Code"

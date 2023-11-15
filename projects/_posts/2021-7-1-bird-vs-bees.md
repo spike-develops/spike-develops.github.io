@@ -4,7 +4,7 @@ header:
   id: 6183804?color=000000
   provider: itch
 title: "The Bird and the Bees"
-
+excerpt: "48 hour Game Jam"
 tags: 
  - Unity 
  - C#

@@ -4,6 +4,7 @@ header:
   id: 4008860?color=000000
   provider: itch
 title: "Cosmic Collector"
+excerpt: "48 hour Game Jam"
 tags: 
  - Unity 
  - C#
