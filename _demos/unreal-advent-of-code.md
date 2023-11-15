@@ -1,6 +1,6 @@
 ---
 header:
- teaser: assets\files\adventOfCode.png
+ teaser: /assets/files/adventOfCode.png
 excerpt: unreal gaming
 layout: single
 author_profile: true

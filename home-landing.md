@@ -6,7 +6,7 @@ header:
     overlay_color: "#333"
 
 feature_row_COP:
-  - image_path: assets\files\CultofPersonality_Coverart_Submission_Logo.jpg
+  - image_path: /assets/files/CultofPersonality_Coverart_Submission_Logo.jpg
     alt: "Cop library hero"
     title: "Cult of Personality"
     excerpt: 'okay so this is the excerpt `type="left"`'
