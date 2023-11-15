@@ -1,6 +1,12 @@
 ---
+header:
+ teaser: assets\files\Disconnect_Cover_Half.png
 title: "Disconnect"
 Engine: "Unity - C#"
+excerpt: "a cool game"
+link: _demos\disconnect.md
+btn_class: "btn--primary"
+order_priority : 1  
 ---
 <h1>Disconnect</h1>
 <h3>2023 GMTK 48 hour Jam - "Roles Reversed" Theme</h3>

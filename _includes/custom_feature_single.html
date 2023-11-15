@@ -11,31 +11,27 @@
 {% endif %}
 
 <div class="feature__item{% if include.type %}--{{ include.type }}{% endif %}">
-  <div class="archive__item">
-    {% if teaser %}
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    <div class="archive__item">
+      {% if teaser %}
       <div class="archive__item-teaser">
-        <img src="{{ teaser | relative_url }}"
-              alt="{% if post.alt %}{{ post.alt }}{% endif %}">
-        {% if post.image_caption %}
-          <span class="archive__item-caption">{{ post.image_caption | markdownify | remove: "<p>" | remove: "</p>" }}</span>
-        {% endif %}
+        <img src="{{ teaser | relative_url }}" alt="">
       </div>
-    {% endif %}
-
-    <div class="archive__item-body">
-      {% if post.title %}
-        <h2 class="archive__item-title">{{ post.title }}</h2>
       {% endif %}
+      <h2 class="archive__item-title no_toc" itemprop="headline">
+      {% if post.link %}
+      <a href="{{ post.link }}">{{ title }}</a> <a href="{{ post.url | relative_url }}" rel="permalink"><i class="fas fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
+      {% else %}
+      <a href="{{ post.url | relative_url }}" rel="permalink">{{ title }}</a>
+      {% endif %}
+      </h2>
 
       {% if post.excerpt %}
-        <div class="archive__item-excerpt">
-          {{ post.excerpt | markdownify }}
-        </div>
+      <div class="archive__item-excerpt">
+        {{ post.excerpt | markdownify | truncate: 160}}
+      </div>
       {% endif %}
-
-      {% if post.url %}
-        <p><a href="{{ post.url | relative_url }}" class="btn {{ post.btn_class }}">{{ post.btn_label | default: site.data.ui-text[site.locale].more_label | default: "Learn More" }}</a></p>
-      {% endif %}
+          <!-- shows stuff like 1 minute read  {% include page__meta.html type=include.type %}--->
     </div>
-  </div>
+  </article>
 </div>

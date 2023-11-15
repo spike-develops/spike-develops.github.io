@@ -1,10 +1,14 @@
 ---
+header:
+ teaser: assets\files\adventOfCode.png
+excerpt: unreal gaming
 layout: single
 author_profile: true
 title: "Unreal Advent of Code"
 Engine: "Unreal - C++"
 published: false
 read_time: true
+order_priority : 2
 ---
 [**Advent of Code**](https://adventofcode.com/) is a yearly coding challenge that happens in December. A coding puzzle (typically centered around elves or Santa) is revealed every day until Christmas. It's a great way to brush up on old languages or learn new ones, and in 2022 I used it to stay sharp with **C++ and Unreal**. My self imposed restriction was that I had to visually represent the "solving" of the puzzles in realtime using the engine. 
 
