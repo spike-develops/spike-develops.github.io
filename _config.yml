@@ -302,4 +302,4 @@ defaults:
       share: false
       related: false
       read_time: false
-
+      hide_updated_date: true

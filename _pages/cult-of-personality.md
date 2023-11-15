@@ -1,4 +1,10 @@
 ---
+header: 
+ overlay_image: /assets/files/CoP_Library-Hero.jpg  
+ caption: "Capsule Art: [**MeyersIllustration**](https://www.meyersillustration.com/)"
+ actions:
+ - label: "Steam Page"
+   url: "https://store.steampowered.com/app/1699290/Cult_of_Personality/"
 layout: single
 author_profile: true
 title: "Cult of Personality"
@@ -7,12 +13,7 @@ tagline: "Lead Network and Gameplay Engineer"
 tags: 
  - Unity 
  - C#
-header: 
- overlay_image: /assets/files/CoP_Library-Hero.jpg  
- caption: "Capsule Art: [**MeyersIllustration**](https://www.meyersillustration.com/)"
- actions:
- - label: "Steam Page"
-   url: "https://store.steampowered.com/app/1699290/Cult_of_Personality/"
+hide_updated_date: true
 ---
 <!---
 [**Cult of Personality is Out NOW on Steam**](https://store.steampowered.com/app/1699290/Cult_of_Personality/)
