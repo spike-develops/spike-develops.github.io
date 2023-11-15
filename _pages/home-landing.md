@@ -19,9 +19,10 @@ feature_row_COP:
 
 <div class="feature__wrapper">
 <!-- sort them manually because github is 3.9 and sorting is 4 -->
-{% assign demos = site.demos | sort: "order_priority", "last" %}
+
+{% assign projects = site.categories["projects"] | sort: "order_priority", "last" %}
 <!-- iterate over the first two items-->
-{% for post in demos limit: 2 %}
+{% for post in projects limit: 2 %}
     {% include custom_feature_single.html %}
 {% endfor %}
 <!-- TODO insert the go look at everything button -->

@@ -249,9 +249,10 @@ whitelist:
 #  - <base_path>/tags/my-awesome-tag/index.html ~> path: /tags/
 #  - <base_path>/categories/my-awesome-category/index.html ~> path: /categories/
 #  - <base_path>/my-awesome-category/index.html ~> path: /
-category_archive:
-  type: liquid
-  path: /categories/
+#Removing the category archive, so we don't show them
+#category_archive:
+#  type: liquid
+#  path: /categories/
 tag_archive:
   type: liquid
   path: /tags/
@@ -276,8 +277,8 @@ compress_html:
     envs: development
 
 collections:
-  demos:
-    output: true
+#  demos:
+#    output: true
 
 # Defaults
 #NOTE THERE ARE SEPARATE DEFAULTS FOR DEMO and POSTS currently
@@ -295,7 +296,8 @@ defaults:
       related: true
   # _demos
   - scope:
-      type: demos
+      path: "projects" 
     values:
       layout: splash
-      food: apple
+      share: false
+      related: false

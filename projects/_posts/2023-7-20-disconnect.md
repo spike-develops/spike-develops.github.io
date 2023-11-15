@@ -2,7 +2,9 @@
 header:
  teaser: /assets/files/Disconnect_Cover_Half.png
 title: "Disconnect"
-Engine: "Unity - C#"
+tags: 
+ - Unity 
+ - C#
 excerpt: "a cool game"
 btn_class: "btn--primary"
 order_priority : 1  
