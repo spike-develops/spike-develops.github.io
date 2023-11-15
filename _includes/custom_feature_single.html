@@ -1,0 +1,41 @@
+{% if post.header.teaser %}
+  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% else %}
+  {% assign teaser = site.teaser %}
+{% endif %}
+
+{% if post.id %}
+  {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
+{% else %}
+  {% assign title = post.title %}
+{% endif %}
+
+<div class="feature__item{% if include.type %}--{{ include.type }}{% endif %}">
+  <div class="archive__item">
+    {% if teaser %}
+      <div class="archive__item-teaser">
+        <img src="{{ teaser | relative_url }}"
+              alt="{% if post.alt %}{{ post.alt }}{% endif %}">
+        {% if post.image_caption %}
+          <span class="archive__item-caption">{{ post.image_caption | markdownify | remove: "<p>" | remove: "</p>" }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="archive__item-body">
+      {% if post.title %}
+        <h2 class="archive__item-title">{{ post.title }}</h2>
+      {% endif %}
+
+      {% if post.excerpt %}
+        <div class="archive__item-excerpt">
+          {{ post.excerpt | markdownify }}
+        </div>
+      {% endif %}
+
+      {% if post.url %}
+        <p><a href="{{ post.url | relative_url }}" class="btn {{ post.btn_class }}">{{ post.btn_label | default: site.data.ui-text[site.locale].more_label | default: "Learn More" }}</a></p>
+      {% endif %}
+    </div>
+  </div>
+</div>
