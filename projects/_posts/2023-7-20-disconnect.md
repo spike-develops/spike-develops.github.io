@@ -8,7 +8,7 @@ title: "Disconnect"
 tags: 
  - Unity 
  - C#
-excerpt: "48 hour Game Jam"
+excerpt: "Programmer - 48 hour Game Jam"
 #had to add this cause my hacked feature row is getting it from the "page" we're talking about
 #not the landing page
 btn_class: "btn--primary"
