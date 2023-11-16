@@ -23,5 +23,9 @@ feature_row_COP:
 {% for post in projects limit: 2 %}
     {% include custom_feature_single.html %}
 {% endfor %}
-<!-- TODO insert the go look at everything button -->
+
+<!-- super hacky and badn -->
+{% assign post = site.pages[5] %}
+{% include custom_feature_single.html %}
+
 </div>
