@@ -9,10 +9,11 @@ layout: single
 author_profile: true
 title: "Cult of Personality"
 permalink:  /cult-of-personality/
-tagline: "Lead Network and Gameplay Engineer"
+tagline: "Lead Engineer"
 tags: 
  - Unity 
  - C#
+ - FMOD
 hide_updated_date: true
 
 mdev_gallery:
@@ -23,7 +24,6 @@ mdev_gallery:
   - image_path: /assets/files/mdev/Courtney_Booth_Square.jpg
     url: /assets/files/mdev/Courtney_Booth_Square.jpg
 
-
 possessed_gallery:
   - url: /assets/files/PossessingExample.png
     image_path: /assets/files/PossessingExample.png
@@ -33,31 +33,29 @@ possessed_gallery:
     image_path: /assets/files/PossessedExample.png
     alt: "Possessed Player Perspective"
     title: "Perspective of the possessed player"
-
 ---
 
+*Cult of Personality (CoP) is 5-8 player online multiplayer social deception game ala Among Us. Players play as a Cultist, working with their peers to perform a forbidden ritual, or a disillusioned Defector, trying to stop them using deceit, possession, and murder!*
 
+Our development cycle lasted 2 years full-time, and our Steam release was Oct 26th, 2023!
 
-**Development Time:** 2 years
-
-**Team Composition:**
- - Pixel Artist, Designer
+#### Team Composition
  - **Engineer, Designer (My role)**
+ - Pixel Artist, Designer
  - Capsule Artist
  - Tools Programmer
 
-TODO expand this engineering highlights section
+#### Project highlights
+- [Built a custom server authoritative, client predictive, netcode on top of Steamworks P2P to support player-on-player possession](#custom-netcode)
+- [Implemented hierarchical state machines for actor behavior, with client state rollback](#hierarchical-state-machines)
+- Integrated Native proximity/Room based voice and text chat, using Dissonance Voip and FMod Studio
+- Designed a 2D ambient occlusion shader system to project pixel shadows and prevent overlap
 
-Engineering highlights
-- [Custom Netcode](#custom-netcode)
-- [Hierarchical State Machines](#hierarchical-state-machines)
+## Media
+Showing off CoP at M+Dev 2023
+{% include gallery id="mdev_gallery" %}
 
-
-{% include gallery id="mdev_gallery" caption="Showing off CoP at the 2023 M+Dev Games Showcase" %}
-
-
-### Gameplay
-Recording from an October 2023 beta test
+Gameplay Recording from an October 2023 beta test
 {% include video id="at7E-_t5S2g" provider="youtube" %}
 
 ## Custom Netcode

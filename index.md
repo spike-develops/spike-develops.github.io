@@ -2,12 +2,15 @@
 layout: splash
 sitemap: false
 header:
-    overlay_color: "#333"
+    overlay_image: /assets/files/DameWelcome.jpg
+    overlay_filter: linear-gradient(rgba(0, 255, 255, 0.5), rgba(0, 0, 0, .7))
+
+tagline: "Engineer with an affinity for atmospheric projects"
 feature_row_COP:
   - image_path: /assets/files/CultofPersonality_Coverart_Submission_Logo.jpg
     alt: "Cop library hero"
     title: "Cult of Personality"
-    excerpt: 'Lead network and gameplay engineer'
+    excerpt: 'Lead network and gameplay Engineer'
     url: /cult-of-personality/
     btn_label: "More Info"
     btn_class: "btn--primary"
