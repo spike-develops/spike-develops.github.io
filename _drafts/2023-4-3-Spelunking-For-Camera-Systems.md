@@ -26,24 +26,64 @@ As a notice, this explanation won't go into super specifics, and assumes a basic
 
 Since Cinemachine's workflow involves a single real camera/brain being aimed and positioned by various virtual cameras, to get a proper dissolve effect isn't as simple as adding another vCam and calling it a day. While the dissolve is happening, we'll need to render both places at once until the transition is complete.
 
-There are a few ways to go about this, but I opted to use some of the techniques described in [this thread,](https://forum.unity.com/threads/is-it-possible-for-a-blend-to-interpolate-between-images-instead-of-position.541865/#post-3573211) since it'll help down the line we we start adding the Spelunky Flair. The gist is that we'll create a second real camera that is only used during the transition, and exclusively renders to a render texture that we create.
-
-TODO add some info about the render texture in a screenshot of it?
-
-
-
-Then, we create a new virtualCamera and add a "storyboard" extension to it. Storyboards overlay a texture on top of whatever the vCam is rendering, and are great for quick and dirty fades to color, but they really start shining when used in tandem with Render Textures. 
-
-When we plop in the render texture from earlier, all of a sudden we have a virtual camera that the main camera can transition to, that really just displays whatever our TransitionCamera is looking at. nifty.
-
-The other really awesome thing is that any sort of transition between this new storyboardVCam will naturally fade in/out the storyboard render texture without extra overhead. pog.
+There are a few ways to go about this, but I opted to use some of the techniques described in [this thread.](https://forum.unity.com/threads/is-it-possible-for-a-blend-to-interpolate-between-images-instead-of-position.541865/#post-3573211) The gist is that we'll create a second real camera that renders to a render texture, and then display that render texture on a "Storyboard" virtual camera that the Main Camera brain can then mix.
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/SimpleDisolve.gif"><img src="/assets/files/SpelunkyCam/SimpleDisolve.gif"></a>
+    <img src="/assets/files/SpelunkyCam/InitialWhiteboardExample.png">
+    <figcaption>Mockup of our planned system</figcaption>
+</figure>
+
+The new Storyboard VCam is duly named because we'll attach a Cinemachine storyboard extension to it. The extension overlays (our render texture) as if it were the camera view. The big advantage of using the storyboard is that any transitions will naturally fade the storyboard texture, which gives us our first look at a dissolve.
+
+<figure>
+    <a href="/assets/files/SpelunkyCam/SimpleDissolve.gif"><img src="/assets/files/SpelunkyCam/SimpleDissolve.gif"></a>
     <figcaption>Basic Disolve from "UpperCam" to "StoryboardCam" </figcaption>
 </figure>
 
-An *almost* working dissolve. The Snag we hit though, is the fact that we can only dissolve to/from the virtual storyboard cam. If we want to end the transition on **lowerCam**, we have to hide a cut from our storyboard to it.
+The fact that we can only dissolve to/from the storyboard VCam is a bit of a snag, since ideally we "end" the transition on `LowerCam`, but that'll get solved out in the next part.
+
+#### Next step: Positioning the Storyboard Cam
+
+This is where some scripting comes in. We need to position and frame `StoryboardCam` to match whatever VCam we want to end on. (up to this point, It just had the same settings as `LowerCam` for demo purposes)
+
+```cs
+public void QueueTransition(ICinemachineCamera startCam, ICinemachineCamera endCam, bool highToLow){
+    //If the transition is already queued ignore it.
+    if (_transitionQueued)
+        return;
+    //position the storyboard camera to match the transition
+    PositionStoryboardCamera(endCam);
+    //trigger the transition
+    StartCoroutine(FlickerPriority());
+}
+```
+
+```cs
+private IEnumerator FlickerPriority() {
+    _transitionQueued = true;
+    storyboardCam.Priority.Value = int.MaxValue;
+    
+    yield return null;
+
+    storyboardCam.Priority.Value = int.MinValue;
+    _transitionQueued = false;
+}
+```
+
+```cs
+private void PositionStoryboardCamera(ICinemachineCamera endCam){
+    //make sure we have the most up to camera positions
+    endCam.UpdateCameraState(Vector3.up, 0f);
+    
+    var pos = endCam.State.GetFinalPosition();
+    var rot = endCam.State.GetFinalOrientation();
+    //set storyboard to pos and rot of the end cam
+    storyboardCam.ForceCameraPosition(pos, rot);
+    //set camera ortho size
+    storyboardCam.Lens.OrthographicSize = endCam.State.Lens.OrthographicSize;
+}
+```
+
 
 ~~But of course, this is a tut about the Spelunky effect, and it's cool because it doesn't just dissolve, it also trucks into and out of the transition room to really sell the spatial change.~~
 
@@ -51,6 +91,13 @@ An *almost* working dissolve. The Snag we hit though, is the fact that we can on
 
 **If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters.
 {: .notice}
+
+
+
+<figure>
+    <img src="/assets/files/SpelunkyCam/ThirdWhiteboardExample.png">
+    <figcaption>Addition of the Transition Brain system</figcaption>
+</figure>
 
 First wrinkle is to add a brain to the Transition Camera. Since we want to be able to position 
 
