@@ -3,12 +3,17 @@
 
 @charset "utf-8";
 
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 
 .page__hero--overlay{
     background-position: top right !important; 
 }
 
-@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+//TODO would be great to try to get merriweather working
+$serif: Georgia, Times, serif !default;
+$global-font-family : $serif !default;
+
+
 @import "minimal-mistakes"; // main partials
 
 
@@ -25,5 +30,17 @@ html {
   
     @include breakpoint($x-large) {
       font-size: 20px; // change to whatever
+    }
+  }
+
+//shrink the main article font, and give it extra spacing.
+//
+  .page__content {
+
+    p,
+    li,
+    dl {
+      line-height: 1.75;
+      font-size: .9em;
     }
   }
