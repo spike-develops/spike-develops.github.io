@@ -9,10 +9,10 @@ Spelunky has a cool flipping camera effect that doesn't happen that often. Backr
 
 <figure>
     <a href="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"><img src="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"></a>
-    <figcaption>Spelunky's original effect does a great job conveying the transition between its main level and "backrooms" (whats right term for that)</figcaption>
+    <figcaption>Spelunky's original effect does a great job conveying the transition between its main level and back layer</figcaption>
 </figure>
 
-**I should write some text about why I wanted to do it or something here/why it is such a good effect. Also gives room to breath between the two example gifs**
+~~**I should write some text about why I wanted to do it or something here/why it is such a good effect. Also gives room to breath between the two example gifs**~~
 
 <figure>
     <a href="/assets/files/SpelunkyCam/CopExampleComplete.gif"><img src="/assets/files/SpelunkyCam/CopExampleComplete.gif"></a>
@@ -22,7 +22,7 @@ Spelunky has a cool flipping camera effect that doesn't happen that often. Backr
 <!--How in depth am I going? Do I show the Components?-->
 As a notice, this explanation won't go into super specifics, and assumes a basic understanding of Unity and it's Cinemachine camera system. If you aren't there yet, the [Cinemachine Docs](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/index.html) are a great place to start &#128513;
 
-#### First step: Camera dissolve
+#### Basic Camera Dissolve
 
 Since Cinemachine's workflow involves a single real camera/brain being aimed and positioned by various virtual cameras, to get a proper dissolve effect isn't as simple as adding another vCam and calling it a day. While the dissolve is happening, we'll need to render both places at once until the transition is complete.
 
@@ -43,9 +43,9 @@ The new Storyboard VCam is duly named because we'll attach a Cinemachine storybo
 ~~The fact that we can only dissolve to/from the storyboard VCam is a bit of a snag, since ideally we "end" the transition on `LowerCam`, but that'll get solved out in the next part.~~
 
 
-#### Next step: Positioning the Storyboard Cam
+#### Positioning the Storyboard Cam
 
-Next we'll cover how we position `storyboardCam` to sync with wherever our Transition Destination cam is.
+Next we'll cover how we position `storyboardCam` to sync with wherever our Transition Destination cam is. Here's our `PositionTransitionCameras()` method.
 
 ```cs
 private void PositionStoryboardCamera(ICinemachineCamera destinationCam, float orthoOffset){
@@ -66,20 +66,9 @@ Instead of having `storyboardCam` match the position and orthographic size of `d
     <figcaption>Cutting immediately to Storyboard from Upper (Source), then easing to Lower (Destination)</figcaption>
 </figure>
 
-TODO go over the cutting/flicker priority here?
-
-```cs
-private IEnumerator FlickerPriority() {
-    _transitionQueued = true;
-    storyboardCam.Priority.Value = int.MaxValue;
-    yield return null;
-    storyboardCam.Priority.Value = int.MinValue;
-    _transitionQueued = false;
-}
-```
 After this we'll have a halfway transition that doesn't look great, so we need to get the other side working. 
 
-#### Final step: Controlling the TransitionCamera?
+#### Positioning the Transition Camera
 Up till this point the Transition Camera (and therefore the RenderTexture that the storyboard cam displays) has been manually positioned to sit wherever the sourceCam was.
 
 To "complete" the Spelunky effect, we want it to look like the source camera has a matching zoom like the destination camera does. To do that we'll start by complicating our diagram a bit, and adding a second Cinemachine brain/system to the Transition Camera, along with two new virtual cameras.
@@ -89,45 +78,85 @@ To "complete" the Spelunky effect, we want it to look like the source camera has
     <figcaption>Addition of the Transition Brain system</figcaption>
 </figure>
 
-the new VCams, `TransitionStart` and `TransitionEnd` 
-
-
-The goal here is to mimic the StoryboardCam -> destinationCam movement *within* the storyboard's render texture.
-
-
-
-
-<figure>
-    <img  src="/assets/files/SpelunkyCam/ViewportExample.png">
-    <figcaption>Dichotomy of an animal</figcaption>
-</figure>
-
-
-
-TODO maybe this stuff is below the other stuff.
-
 Because we now have two separate Cinemachine brains, we'll also need to isolate which brains use what VCams. Thankfully that's super easy in Cinemachine 3.0 using [Channel Filters.](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/CinemachineBrain.html?#:~:text=Channel%20Filter%3A%20Cinemachine%20Brain%20uses%20only%20those%20CinemachineCameras%20that%20output%20to%20Channels%20present%20in%20the%20Channel%20Mask.%20You%20can%20set%20up%20split%2Dscreen%20environments%20by%20using%20the%20Channel%20Mask%20to%20filter%20channels.) Simply create a second "Transition" channel and set the new VCams and brain to exclusively use it. (the main camera/brain should exclude the new channel)
 
-**If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters.
+**If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters. TODO attach a link to this
 {: .notice}
 
+The new virtual cameras, `TransitionStart` and `TransitionEnd`, represent where the Transition Camera should start and end its camera move in order to match the StoryboardCam -> destinationCam movement.
+
+<figure>
+    <img src="/assets/files/SpelunkyCam/ViewportExample.png">
+    <figcaption>Arrows show both camera moves. In this case, we're going "down" to the lowerCam, so both ortho sizes shrink during the move</figcaption>
+</figure>
+
+Here's our `PositionTransitionCameras()` method. It mirrors the storyboard version with a few slight differences.
+
+```cs
+private void PositionTransitionCameras(ICinemachineCamera sourceCam, float orthoStartOffset, float orthoEndOffset) {
+        var pos = sourceCam.State.GetFinalPosition();
+        var rot = sourceCam.State.GetFinalOrientation();
+        //align both transition cameras with sourceCam
+        transitionStartCam.ForceCameraPosition(pos, rot);
+        transitionEndCam.ForceCameraPosition(pos, rot);
+        //set ortho offsets for both cameras
+        var baseOrtho = sourceCam.State.Lens.OrthographicSize;
+        transitionStartCam.Lens.OrthographicSize = baseOrtho + orthoStartOffset;
+        transitionEndCam.Lens.OrthographicSize = baseOrtho + orthoEndOffset;
+    }
+```
+We align both transition cams using `sourceCam`, then apply separate ortho offsets to them. These offsets should be inverse of `storyboardCam`'s: negative if transitioning down, and positive when going up.
+
+`transitionStartCam`'s ortho can match `sourceCam`'s, but offsetting it slightly it gives the transition a nice jumpstart, and helps hide the initial cut.
+{: .notice}
+
+<figure>
+    <a href="/assets/files/SpelunkyCam/FullTransition.gif"><img src="/assets/files/SpelunkyCam/FullTransition.gif"></a>
+    <figcaption>(Transition Camera) cutting immediately to transition start, then easing back to transition end</figcaption>
+</figure>
+
+#### Triggering the Transition
+Up until now we've been glossing over how to actually trigger the transition. 
+Once you know which cams will be the source and destination, and know if the transition should go "up" or down" you can use this `QueueTransition()` method.
+
+```cs
+public void QueueTransition(ICinemachineCamera sourceCam, ICinemachineCamera destinationCam, bool transitioningDown){
+        //If the transition is already queued ignore it.
+        if (_transitionQueued)
+            return;
+        //only difference between transitioning down vs up is inverting the offsets :0
+        if (transitioningDown){
+            PositionTransitionCameras(sourceCam, -offsetStartValue, -offsetValue);
+            PositionStoryboardCamera(destinationCam, offsetValue);
+        }else{
+            PositionTransitionCameras(sourceCam, offsetStartValue, offsetValue);
+            PositionStoryboardCamera(destinationCam, -offsetValue);
+        }
+        //trigger the transition
+        StartCoroutine(FlickerPriority());
+    }
+```
+
+The `FlickerPriority` Coroutine is also pretty simple.
+
+```cs
+private IEnumerator FlickerPriority() {
+    _transitionQueued = true;
+    transitionStartCam.Priority.Value = int.MaxValue;
+    storyboardCam.Priority.Value = int.MaxValue;
+    //wait a frame, then lower their priority
+    yield return null;
+    storyboardCam.Priority.Value = int.MinValue;
+    transitionStartCam.Priority.Value = int.MinValue;
+    _transitionQueued = false;
+}
+```
+This method (along with a custom blend asset) is what gives us the cut-then-fade effect for both Cameras.
+We need to wait a frame in order to give the brains a chance to process the cuts to `storyboardCam` and `transitionStartCam` respectively, before dropping the priority to trigger the fades to `destinationCam` and `transitionEndCam`.
 
 
-Now we'll finaly go back to the Transition Camera Brain system. We'll add a new VCAm (making sure to set the layer to ___) The goal here is to create a similar movement that the storyboardVCam -> real cam has, except all within the render texture that's displayed on the storyboard cam. 
 
-We can just have the start camera here start at the old cameras ortho size, and then set the exit to the same ratio that the other camera has and things would work, but we can also help hide the cut by jumping slightly "ahead" IE if the old cameras ortho was 3.5, and we're "pushing in" instead of setting start to 3.5, and end to 1.5, we could set start to 3.25, and end to 1.25, "jumping" ahead. This really helps hide the cut between the real camera to the render Camera, and gives some extra punch to the transition. 
+TODO need to explain that before calling QueueTransition, you need to have just triggered the source to destination transition. Or do we make that part of this version? that way its all packaged as one thing...
 
-We can also do some cool stuff to the render texture -add pixialtion to the transition, different post processing, etc.
+TODO show the camera blends.
 
-
-
-
-
-
-
-Run into a snag where State.Lens ortho is 10, but the vCam is clearly supposed to be 3.75. Its because I never gave enough time for the camera to update before disabling. So I either need to swap how i do that kind of thing, or find a way to force the final enter cam to evaluate itself right away.
-
-
-
-
-Ran into another snag where pixel perfect math gets in the way of doing a one-to-one transistion, and instead it veered off (I made a trello card about it)
