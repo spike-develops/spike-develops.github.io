@@ -36,7 +36,7 @@ There are a few ways to go about this, but I opted to use some of the techniques
     <figcaption>Mockup of our planned system</figcaption>
 </figure>
 
-The new `storyboardCam` is duly named because we'll attach a Cinemachine storyboard extension to it. The extension overlays (our render texture) as if it were the camera view. The big advantage of using the storyboard is that any transitions will naturally fade the storyboard texture, which gives us our first look at a dissolve.
+The new `storyboardCam` is duly named because we'll attach a [Cinemachine Storyboard](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/CinemachineStoryboard.html) extension to it. The extension overlays (our render texture) as if it were the camera view. The big advantage of using the storyboard is that any transitions will naturally fade the storyboard texture, which gives us our first look at a dissolve.
 
 <figure>
     <a href="/assets/files/SpelunkyCam/SimpleDissolve.gif"><img src="/assets/files/SpelunkyCam/SimpleDissolve.gif"></a>
