@@ -6,14 +6,16 @@ tags:
  - Cinemachine
 ---
 
-Spelunky has a cool flipping camera effect that doesn't happen that often. Backrooms in spelunky, blah blah
+<!--TODO make this maybe smaller or italicied? I don't like how its talking about nothing here, it should be easy to gloss over-->
+Spelunky (1 and 2) are a series of 2D rouge-likes centered around cave-delving. They're fantastic platformers that you should try if you haven't! One of the additions in the second game were randomly spawning entrances to a "back layer" that sits *behind* the main level, containing extra platforming areas, npc's, or puzzles. I'd argue the best part about the back layer though, is the camera transition to it.
 
 <figure>
     <a href="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"><img src="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"></a>
-    <figcaption>Spelunky's original effect does a great job conveying the transition between its main level and back layer</figcaption>
+    <figcaption>Spelunky 2's camera transition between its main and back layers</figcaption>
 </figure>
 
-~~**TODO write some text about why I wanted to do it or something here/why it is such a good effect. Also gives room to breath between the two example gifs**~~
+It's a dissolve that also conveys a sense of where the transition leads depth-wise, which is pretty helpful in providing spatial awareness to players, especially for games with traditionally flat 2D perspective. 
+<!--TODO I felt like that was why it would make a perfect transition between floors for Cop-->
 
 <figure>
     <a href="/assets/files/SpelunkyCam/CopExampleComplete.gif"><img src="/assets/files/SpelunkyCam/CopExampleComplete.gif"></a>
@@ -160,3 +162,4 @@ We need to wait a frame in order to give the brains a chance to process the cuts
 </figure>
 
 TODO conclusion/show link the full script
+<!--Okay so for real cold approach the babe-->
