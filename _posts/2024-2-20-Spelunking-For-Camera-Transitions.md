@@ -45,19 +45,22 @@ The new `storyboardCam` is duly named because we'll attach a [Cinemachine Storyb
 
 #### Positioning the Storyboard Cam
 
-Next we'll cover how we sync `storyboardCam` with wherever our Transition's `destinationCam` is. Here's our `PositionTransitionCameras()` method.
+Next we'll cover how we sync `storyboardCam` with wherever our Transition's `destinationCam` is. Here's our `PositionStoryboardCam()` method.
 
 ```cs
-private void PositionStoryboardCamera(CinemachineCamera destinationCam, float orthoOffset){
-        var pos = destinationCam.State.GetFinalPosition();
-        var rot = destinationCam.State.GetFinalOrientation();
-        //use ForceCameraPosition so Cinemachine internals stay happy.
-        storyboardCam.ForceCameraPosition(pos, rot);
-        //offset storyboard ortho to create the zoom transition
-        var baseOrtho = endCam.State.Lens.OrthographicSize;
-        var calculatedOrtho = baseOrtho + orthoOffset;
-        storyboardCam.Lens.OrthographicSize = calculatedOrtho;
-    }
+private void PositionStoryboardCam(CinemachineCamera destinationCam, 
+    float orthoOffset){
+
+    var pos = destinationCam.State.GetFinalPosition();
+    var rot = destinationCam.State.GetFinalOrientation();
+    //use ForceCameraPosition so Cinemachine internals stay happy.
+    storyboardCam.ForceCameraPosition(pos, rot);
+
+    //offset storyboard ortho to create the zoom transition
+    var baseOrtho = endCam.State.Lens.OrthographicSize;
+    var calculatedOrtho = baseOrtho + orthoOffset;
+    storyboardCam.Lens.OrthographicSize = calculatedOrtho;
+}
 ```
 Instead of having `storyboardCam` match the position and orthographic size of `destinationCam` exactly, we'll tweak the ortho size to be slightly bigger or smaller than the end camera. This starts to create the Spelunky zoom that we're looking for. If transitioning "down" or "into", `orthoOffset` should be positive, and negative when transitioning "up" or "out of".
 
@@ -90,20 +93,23 @@ The new virtual cameras, `transitionStartCam` and `TransitionEndCam`, represent 
     <figcaption>Arrows show both camera moves. In this case, we're going "down" to the lowerCam, so both ortho sizes shrink during the move</figcaption>
 </figure>
 
-Here's our `PositionTransitionCameras()` method. It mirrors the storyboard version with a few slight differences.
+Here's our `PositionTransitionCams()` method. It mirrors the storyboard version with a few slight differences.
 
 ```cs
-private void PositionTransitionCameras(CinemachineCamera sourceCam, float orthoStartOffset, float orthoEndOffset) {
-        var pos = sourceCam.State.GetFinalPosition();
-        var rot = sourceCam.State.GetFinalOrientation();
-        //align both transition cameras with sourceCam
-        transitionStartCam.ForceCameraPosition(pos, rot);
-        transitionEndCam.ForceCameraPosition(pos, rot);
-        //set ortho offsets for both cameras
-        var baseOrtho = sourceCam.State.Lens.OrthographicSize;
-        transitionStartCam.Lens.OrthographicSize = baseOrtho + orthoStartOffset;
-        transitionEndCam.Lens.OrthographicSize = baseOrtho + orthoEndOffset;
-    }
+private void PositionTransitionCams(CinemachineCamera sourceCam, 
+    float startOffset, float endOffset){
+
+    //align both transition cameras with sourceCam
+    var pos = sourceCam.State.GetFinalPosition();
+    var rot = sourceCam.State.GetFinalOrientation();
+    transitionStartCam.ForceCameraPosition(pos, rot);
+    transitionEndCam.ForceCameraPosition(pos, rot);
+
+    //set ortho offsets for both cameras
+    var baseOrtho = sourceCam.State.Lens.OrthographicSize;
+    transitionStartCam.Lens.OrthographicSize = baseOrtho + startOffset;
+    transitionEndCam.Lens.OrthographicSize = baseOrtho + endOffset;
+}
 ```
 We align both transition cams using `sourceCam`, then apply separate ortho offsets to them. These offsets should be inverse of `storyboardCam`'s: negative if transitioning down, and positive when going up.
 
@@ -120,34 +126,41 @@ Up until now we've been glossing over how to actually trigger the transition.
 Once you know which VCams will be the source and destination, and know if the transition should go "up" or down" you can use this `QueueTransition()` method. It does assume some things about your Cinemachine priority system, but should be pretty easy to modify to fit your needs.
 
 ```cs
-public void QueueTransition(CinemachineCamera sourceCam, CinemachineCamera destinationCam, bool transitioningDown){
-        //If the transition is already queued ignore it.
-        if (_transitionQueued)
-            return;
-        //set destination to whatever your active priority is, and source to inactive
-        destinationCam.Priority.Value = activePriority;
-        sourceCam.Priority.Value = inactivePriority;
-        //only difference between transitioning down vs up is inverting the offsets :0
-        if (transitioningDown){
-            PositionTransitionCameras(sourceCam, -offsetStartValue, -offsetValue);
-            PositionStoryboardCamera(destinationCam, offsetValue);
-        }else{
-            PositionTransitionCameras(sourceCam, offsetStartValue, offsetValue);
-            PositionStoryboardCamera(destinationCam, -offsetValue);
-        }
-        //trigger the transition
-        StartCoroutine(FlickerPriority());
+public void QueueTransition(CinemachineCamera sourceCam, 
+    CinemachineCamera destinationCam, bool transitioningDown){
+
+    //If the transition is already queued ignore it.
+    if (_transitionQueued)
+        return;
+    //set destination to active priority, and source to inactive
+    destinationCam.Priority.Value = activePriority;
+    sourceCam.Priority.Value = inactivePriority;
+
+    //invert offsets if depending on transition direction
+    if (transitioningDown){
+        PositionTransitionCams(sourceCam, -initialOffset, -deltaOffset);
+        PositionStoryboardCam(destinationCam, offsetValue);
+    }else{
+        PositionTransitionCams(sourceCam, initialOffset, deltaOffset);
+        PositionStoryboardCam(destinationCam, -offsetValue);
     }
+
+    //trigger the transition
+    StartCoroutine(FlickerPriority());
+}
 ```
 The `FlickerPriority()` Coroutine is also pretty simple.
 
 ```cs
-private IEnumerator FlickerPriority() {
+private IEnumerator FlickerPriority(){
+    
     _transitionQueued = true;
     transitionStartCam.Priority.Value = int.MaxValue;
     storyboardCam.Priority.Value = int.MaxValue;
+
     //wait a frame, then lower their priority
     yield return null;
+
     storyboardCam.Priority.Value = int.MinValue;
     transitionStartCam.Priority.Value = int.MinValue;
     _transitionQueued = false;
