@@ -153,7 +153,6 @@ The `FlickerPriority()` Coroutine is also pretty simple.
 
 ```cs
 private IEnumerator FlickerPriority(){
-    
     _transitionQueued = true;
     transitionStartCam.Priority.Value = int.MaxValue;
     storyboardCam.Priority.Value = int.MaxValue;
