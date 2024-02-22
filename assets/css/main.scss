@@ -14,6 +14,8 @@ $serif: Georgia, Times, serif !default;
 $global-font-family : $serif !default;
 
 
+
+
 @import "minimal-mistakes"; // main partials
 
 
@@ -50,3 +52,9 @@ html {
   figure.highlight {
     line-height: 1.45;
   }
+
+  //make gists self compact themselves
+  .gist-data{
+    max-height:400px; // Any height
+    overflow-y: visible;
+}

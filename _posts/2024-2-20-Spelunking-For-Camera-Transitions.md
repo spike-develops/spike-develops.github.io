@@ -173,5 +173,7 @@ We need to wait a frame in order to give the brains a chance to process the cuts
     <figcaption>Custom blend asset usable by both brains. The cuts shouldn't be modified, but both eases can be tweaked for transition feel. </figcaption>
 </figure>
 
-TODO conclusion/show link the full script
+TODO conclusion
+
+<script src="https://gist.github.com/spike-develops/5d44322620444f2ee1f2120de1096451.js"></script>
 <!--Okay so for real cold approach the babe-->
