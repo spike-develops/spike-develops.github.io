@@ -70,10 +70,10 @@ Instead of having `storyboardCam` match the position and orthographic size of `d
 
 After this we'll have a halfway transition that doesn't look great, so we need to get the other side working. 
 
-#### Positioning the Transition Camera
+#### Adding Brains to the Transition Camera
 Up till this point the Transition Camera (and therefore the RenderTexture that the `storyboardCam` displays) has been manually positioned to sit wherever `sourceCam` was.
 
-To "complete" the Spelunky effect, we want it to look like the source camera has a matching zoom like the destination camera does. To do that we'll start by complicating our diagram a bit, and adding a second Cinemachine brain/system to the Transition Camera, along with two new virtual cameras.
+To "complete" the Spelunky effect, we want it to look like the source camera has a matching zoom like the destination camera does. To do that we'll start by complicating our diagram a bit, and adding a second Cinemachine brain coined `transitionBrain`, along with two new virtual cameras.
 
 <figure>
     <img src="/assets/files/SpelunkyCam/ThirdWhiteboardExample.png">
@@ -85,7 +85,7 @@ Because we now have two separate Cinemachine brains, we'll also need to isolate 
 **If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters.
 {: .notice}
 
-The new virtual cameras, `transitionStartCam` and `TransitionEndCam`, represent where the Transition Camera should start and end its camera move in order to match the `storyboardCam` -> `destinationCam` movement.
+The new virtual cameras, `transitionStartCam` and `TransitionEndCam`, represent where `transitionBrain` will start and end its camera move in order to match the `storyboardCam` -> `destinationCam` movement.
 
 <figure>
     <img src="/assets/files/SpelunkyCam/ViewportExample.png">
@@ -98,13 +98,13 @@ Here's our `PositionTransitionCams()` method. It mirrors the storyboard version 
 private void PositionTransitionCams(CinemachineCamera sourceCam, 
     float startOffset, float endOffset){
 
-    //align both transition cameras with sourceCam
+    //align both transition cams with sourceCam
     var pos = sourceCam.State.GetFinalPosition();
     var rot = sourceCam.State.GetFinalOrientation();
     transitionStartCam.ForceCameraPosition(pos, rot);
     transitionEndCam.ForceCameraPosition(pos, rot);
 
-    //set ortho offsets for both cameras
+    //set ortho offsets for both cams
     var baseOrtho = sourceCam.State.Lens.OrthographicSize;
     transitionStartCam.Lens.OrthographicSize = baseOrtho + startOffset;
     transitionEndCam.Lens.OrthographicSize = baseOrtho + endOffset;
@@ -117,7 +117,7 @@ We align both transition cams using `sourceCam`, then apply separate ortho offse
 
 <figure>
     <a href="/assets/files/SpelunkyCam/FullTransition.gif"><img src="/assets/files/SpelunkyCam/FullTransition.gif"></a>
-    <figcaption>(Transition Camera) cutting immediately to transition start, then easing back to transition end</figcaption>
+    <figcaption>(Transition Brain) cutting immediately to transition start, then easing back to transition end</figcaption>
 </figure>
 
 #### Triggering the Transition
@@ -153,12 +153,16 @@ public void QueueTransition(CinemachineCamera sourceCam,
     StartCoroutine(FlickerPriority());
 }
 ```
+First we modify the provided cam priorities, so by the end of the transition `destinationCam` will be active. Then we Position all our extra cams with offsets depending on transition direction.
 
-TODO improve this area
+```cs
+transitionBrain.gameObject.SetActive(true);
+CinemachineCore.CameraDeactivatedEvent.AddListener(CamDeactivated);
+_transitionInProgress = true;
+```
+In these lines, we do the important job of activating `transitionBrain` and it's *very real* camera. While we're *not* transitioning, we'll deactivate it in order to avoid waisting time rendering a texture that won't be seen.
 
-something something the lines about transitionBrain are important, because we only wan't `transitionBrain` and its very real camera rendering the storyboard's render texture during the transition. Otherwise we'd be waisting valuable GPU time on rendering that won't be seen. 
-
-The good news is that we know that we only need to do the extra rendering while `storyboardCam` is active, so we can hook into Cinemachine's CameraDeactivatedEvent, and turn the transition camera back off when the transition ends.
+The transition is technically finished once `storyboardCam` is no longer live. At that point, we can deactivate `transitionBrain` again. The good news is we can hook into Cinemachine's `CameraDeactivatedEvent`, to know exactly when that happens.
 
 ```cs
 private void CamDeactivated(ICinemachineMixer mixer, 
@@ -173,10 +177,9 @@ private void CamDeactivated(ICinemachineMixer mixer,
     _transitionInProgress = false;
 }
 ```
-Since Cinemachine's `CameraDeactivatedEvent` gets called for all camera deactivations, we need to start by confirming we only respond to `storyboardCam`. Then its just a matter of deactivating `transitionBrain` to stop duplicate rendering, and cleaning up after ourselves.
+Since `CameraDeactivatedEvent` gets called for all camera deactivations, we need to start by dropping any non `storyboardCam` signals. Then its just a matter of deactivating `transitionBrain` to stop that pesky double rendering, and cleaning up after ourselves.
 
-The `FlickerPriority()` Coroutine is also pretty simple.
-
+Finally we have the `FlickerPriority()` Coroutine used in `QueueTransition()`.
 ```cs
 private IEnumerator FlickerPriority(){
     transitionStartCam.Priority.Value = int.MaxValue;
@@ -199,6 +202,6 @@ We need to wait a frame in order to give the brains a chance to process the cuts
 
 #### Full Script
 
-That about wraps up my take on what I've always thought is a pretty nifty and useful transition effect! The full FloorTransitionController component is below, with some extra modifications for specific circumstances like use with a Pixel Perfect Camera. Happy Spelunking!
+That about wraps up my take on what I think is a pretty nifty and useful transition effect! The full FloorTransitionController component is below, with some extra modifications for specific circumstances like use with a Pixel Perfect Camera. Happy Spelunking!
 
 <script src="https://gist.github.com/spike-develops/5d44322620444f2ee1f2120de1096451.js"></script>
