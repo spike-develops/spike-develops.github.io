@@ -1,4 +1,10 @@
 ---
+title: Making Spelunky 2's Floor Transition in Unity
+excerpt: Replicating the transition with Cinemachine and render textures
+header:
+    overlay_image: /assets/files/SpelunkyCam/ViewportExample.png
+    overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
+
 permalink: /articles/spelunking-for-camera-transitions/
 author_profile: true
 tags: 
