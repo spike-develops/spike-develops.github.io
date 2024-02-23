@@ -1,4 +1,5 @@
 ---
+permalink: /articles/spelunking-for-camera-transitions/
 author_profile: true
 tags: 
  - Unity 
