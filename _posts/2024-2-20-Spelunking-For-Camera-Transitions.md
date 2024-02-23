@@ -6,24 +6,23 @@ tags:
  - Cinemachine
 ---
 
-<!--TODO make this maybe smaller or italicied? I don't like how its talking about nothing here, it should be easy to gloss over-->
-Spelunky (1 and 2) are a series of 2D rouge-likes centered around cave-delving. They're fantastic platformers that you should try if you haven't! One of the additions in the second game were randomly spawning entrances to a "back layer" that sits *behind* the main level, containing extra platforming areas, npc's, or puzzles. I'd argue the best part about the back layer though, is the camera transition to it.
+Spelunky (1 and 2) are a series of 2D rouge-likes centered around cave-delving. They're fantastic platformers that you should try if you haven't! One of the additions in the second instalment was a "back layer" that sits *behind* the main level, containing extra platforming areas and npc's. **I'd argue the best part about the back layer though, is the camera transition to it.**
 
 <figure>
     <a href="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"><img src="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"></a>
     <figcaption>Spelunky 2's camera transition between its main and back layers</figcaption>
 </figure>
 
-It's a dissolve that also conveys a sense of where the transition leads depth-wise, which is pretty helpful in providing spatial awareness to players, especially for games with traditionally flat 2D perspective. 
-<!--TODO I felt like that was why it would make a perfect transition between floors for Cop-->
+It zips to the character's new layer with a subtle dissolve, and it's impressively clear *where the layers are in respect to each other depth-wise* from the subtle zoom in/out. No small feat in a typically depth-less 2D environment. 
+
+All that lead me towards figuring out how to replicate the effect for Cult of Personality! Making sure players maintained spatial awareness during floor transitions was super important, and Spelunky's transition fit the bill.
 
 <figure>
     <a href="/assets/files/SpelunkyCam/CopExampleComplete.gif"><img src="/assets/files/SpelunkyCam/CopExampleComplete.gif"></a>
     <figcaption>My final CoP implementation, in order to convey the transition between floors from a top-down perspective</figcaption>
 </figure>
 
-<!--How in depth am I going? Do I show the Components?-->
-As a notice, this explanation won't go into super specifics, and assumes a basic understanding of Unity and it's Cinemachine camera system. If you aren't there yet, the [Cinemachine Docs](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/index.html) are a great place to start &#128513;
+I couldn't find any good overviews of the technique, so I figured I'd throw my hat in the ring and show how I did it. As a disclaimer, this explanation assumes a basic understanding of Unity's Cinemachine camera system and render textures. If you aren't there yet, the [Cinemachine Docs](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/index.html) are a great place to start &#128513;
 
 #### Basic Camera Dissolve
 
@@ -83,7 +82,7 @@ To "complete" the Spelunky effect, we want it to look like the source camera has
 
 Because we now have two separate Cinemachine brains, we'll also need to isolate which brains use what VCams. Thankfully that's super easy in Cinemachine 3.0 using [Channel Filters.](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/CinemachineBrain.html?#:~:text=Channel%20Filter%3A%20Cinemachine%20Brain%20uses%20only%20those%20CinemachineCameras%20that%20output%20to%20Channels%20present%20in%20the%20Channel%20Mask.%20You%20can%20set%20up%20split%2Dscreen%20environments%20by%20using%20the%20Channel%20Mask%20to%20filter%20channels.) Simply create a second "Transition" channel and set the new VCams and brain to exclusively use it. (the main camera/brain should exclude the new channel)
 
-**If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters. TODO attach a link to this
+**If using Cinemachine 2.x** You'll need to use Layers/Camera culling masks to achieve this separation instead of channel filters.
 {: .notice}
 
 The new virtual cameras, `transitionStartCam` and `TransitionEndCam`, represent where the Transition Camera should start and end its camera move in order to match the `storyboardCam` -> `destinationCam` movement.
@@ -129,14 +128,14 @@ Once you know which VCams will be the source and destination, and know if the tr
 public void QueueTransition(CinemachineCamera sourceCam, 
     CinemachineCamera destinationCam, bool transitioningDown){
 
-    //If the transition is already queued ignore it.
-    if (_transitionQueued)
+    //If there's already a transition in progress ignore it.
+    if (_transitionInProgress)
         return;
     //set destination to active priority, and source to inactive
     destinationCam.Priority.Value = activePriority;
     sourceCam.Priority.Value = inactivePriority;
 
-    //invert offsets if depending on transition direction
+    //invert offsets depending on transition direction
     if (transitioningDown){
         PositionTransitionCams(sourceCam, -initialOffset, -deltaOffset);
         PositionStoryboardCam(destinationCam, offsetValue);
@@ -145,15 +144,41 @@ public void QueueTransition(CinemachineCamera sourceCam,
         PositionStoryboardCam(destinationCam, -offsetValue);
     }
 
+    //turn on the transitionCamera until the transition is finished
+    transitionBrain.gameObject.SetActive(true);
+    CinemachineCore.CameraDeactivatedEvent.AddListener(CamDeactivated);
+    _transitionInProgress = true;
+
     //trigger the transition
     StartCoroutine(FlickerPriority());
 }
 ```
+
+TODO improve this area
+
+something something the lines about transitionBrain are important, because we only wan't `transitionBrain` and its very real camera rendering the storyboard's render texture during the transition. Otherwise we'd be waisting valuable GPU time on rendering that won't be seen. 
+
+The good news is that we know that we only need to do the extra rendering while `storyboardCam` is active, so we can hook into Cinemachine's CameraDeactivatedEvent, and turn the transition camera back off when the transition ends.
+
+```cs
+private void CamDeactivated(ICinemachineMixer mixer, 
+    ICinemachineCamera deactivatedCam){
+    //ignore any cam deactivations that aren't storyboardCam
+    if (!deactivatedCam.Equals(storyboardCam))
+        return;
+    
+    //turn off the transitionCamera and unsubscribe
+    transitionBrain.gameObject.SetActive(false);
+    CinemachineCore.CameraDeactivatedEvent.RemoveListener(CamDeactivated);
+    _transitionInProgress = false;
+}
+```
+Since Cinemachine's `CameraDeactivatedEvent` gets called for all camera deactivations, we need to start by confirming we only respond to `storyboardCam`. Then its just a matter of deactivating `transitionBrain` to stop duplicate rendering, and cleaning up after ourselves.
+
 The `FlickerPriority()` Coroutine is also pretty simple.
 
 ```cs
 private IEnumerator FlickerPriority(){
-    _transitionQueued = true;
     transitionStartCam.Priority.Value = int.MaxValue;
     storyboardCam.Priority.Value = int.MaxValue;
 
@@ -162,7 +187,6 @@ private IEnumerator FlickerPriority(){
 
     storyboardCam.Priority.Value = int.MinValue;
     transitionStartCam.Priority.Value = int.MinValue;
-    _transitionQueued = false;
 }
 ```
 This method (along with the custom blend asset below) are what gives us the cut-then-fade effect for both camera brains.
@@ -173,7 +197,8 @@ We need to wait a frame in order to give the brains a chance to process the cuts
     <figcaption>Custom blend asset usable by both brains. The cuts shouldn't be modified, but both eases can be tweaked for transition feel. </figcaption>
 </figure>
 
-TODO conclusion
+#### Full Script
+
+That about wraps up my take on what I've always thought is a pretty nifty and useful transition effect! The full FloorTransitionController component is below, with some extra modifications for specific circumstances like use with a Pixel Perfect Camera. Happy Spelunking!
 
 <script src="https://gist.github.com/spike-develops/5d44322620444f2ee1f2120de1096451.js"></script>
-<!--Okay so for real cold approach the babe-->
