@@ -9,6 +9,7 @@
     background-position: top right !important; 
 }
 
+//TODO, would be maybe nice to avoid using serif when in splash layout
 //TODO would be great to try to get merriweather working
 $serif: Georgia, Times, serif !default;
 $global-font-family : $serif !default;
@@ -35,9 +36,11 @@ html {
     }
   }
 
-//shrink the main article font, and give it extra spacing.
+//shrink the main article font while increasing line spacing (only when layout is single)
 //TODO maybe would be nice to avoid the font size reduction when really small? Like mobile
-  .page__content {
+
+.layout--single{
+ .page__content {
 
     p,
     li,
@@ -46,6 +49,7 @@ html {
       font-size: .9em;
     }
   }
+}
 
   //TODO i think this line he
   //make codeblock line height tighter, that way spaces can be used to break things up better
