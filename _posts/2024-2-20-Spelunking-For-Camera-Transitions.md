@@ -44,7 +44,7 @@ Since Cinemachine's workflow involves a single real camera/brain being aimed and
 There are a few ways to go about this, but I opted to use some of the techniques described in [this thread.](https://forum.unity.com/threads/is-it-possible-for-a-blend-to-interpolate-between-images-instead-of-position.541865/#post-3573211) The gist is that we'll create a second real camera that renders to a render texture, and then display that render texture on a "Storyboard" virtual camera that the Main Camera brain can then mix.
 
 <figure>
-    <img src="/assets/files/SpelunkyCam/InitialWhiteboardExample.png">
+    <a href="/assets/files/SpelunkyCam/InitialWhiteboardTransparent.png"><img src="/assets/files/SpelunkyCam/InitialWhiteboardTransparent.png"></a>
     <figcaption>Mockup of our planned system</figcaption>
 </figure>
 
@@ -95,7 +95,7 @@ Up till this point the Transition Camera (and therefore the RenderTexture that t
 To "complete" the Spelunky effect, we want it to look like the source camera has a matching zoom like the destination camera does. To do that we'll start by complicating our diagram a bit, and adding a second Cinemachine brain coined `transitionBrain`, along with two new virtual cameras.
 
 <figure>
-    <img src="/assets/files/SpelunkyCam/ThirdWhiteboardExample.png">
+    <a href="/assets/files/SpelunkyCam/ThirdWhiteboardTransparent.png"><img src="/assets/files/SpelunkyCam/ThirdWhiteboardTransparent.png"></a>
     <figcaption>Addition of the Transition Brain system</figcaption>
 </figure>
 
@@ -107,7 +107,7 @@ Because we now have two separate Cinemachine brains, we'll also need to isolate 
 The new virtual cameras, `transitionStartCam` and `TransitionEndCam`, represent where `transitionBrain` will start and end its camera move in order to match the `storyboardCam` -> `destinationCam` movement.
 
 <figure>
-    <img src="/assets/files/SpelunkyCam/ViewportExample.png">
+    <a href="/assets/files/SpelunkyCam/ViewportExample.png"><img src="/assets/files/SpelunkyCam/ViewportExample.png"></a>
     <figcaption>Arrows show both camera moves. In this case, we're going "down" to the lowerCam, so both ortho sizes shrink during the move</figcaption>
 </figure>
 

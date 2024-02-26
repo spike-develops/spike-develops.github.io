@@ -64,8 +64,14 @@ html {
     overflow-y: visible;
 }
 
-//adding  css that is on figure images to videos as well
+
 figure {
+  //assume an image within a figure might be a diagram, and make its background color dark code
+  img{
+    background-color: $code-background-color-dark;
+  }
+
+  //match the default figure crap when using videos as well
   video {
     width: 100%;
     margin-bottom: 1em;
