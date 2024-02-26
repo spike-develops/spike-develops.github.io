@@ -16,7 +16,10 @@ tags:
 Spelunky (1 and 2) are a series of 2D rouge-likes centered around cave-delving. They're fantastic platformers that you should try if you haven't! One of the additions in the second instalment was a "back layer" that sits *behind* the main level, containing extra platforming areas and npc's. **I'd argue the best part about the back layer though, is the camera transition to it.**
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"><img src="/assets/files/SpelunkyCam/SpelunkyExampleComplete.gif"></a>
+    <video muted autoplay loop playsinline>
+        <source src="/assets/files/SpelunkyCam/SpelunkyExample.mp4"  type="video/mp4"> 
+        Browser doesn't support videos
+    </video>
     <figcaption>Spelunky 2's camera transition between its main and back layers</figcaption>
 </figure>
 
@@ -25,7 +28,10 @@ It zips to the character's new layer with a subtle dissolve, and it's impressive
 All that lead me towards figuring out how to replicate the effect for Cult of Personality! Making sure players maintained spatial awareness during floor transitions was super important, and Spelunky's transition fit the bill.
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/CopExampleComplete.gif"><img src="/assets/files/SpelunkyCam/CopExampleComplete.gif"></a>
+    <video muted autoplay loop playsinline>
+        <source src="/assets/files/SpelunkyCam/CopExample.mp4"  type="video/mp4"> 
+        Browser doesn't support videos
+    </video>
     <figcaption>My final CoP implementation, in order to convey the transition between floors from a top-down perspective</figcaption>
 </figure>
 
@@ -45,7 +51,10 @@ There are a few ways to go about this, but I opted to use some of the techniques
 The new `storyboardCam` is duly named because we'll attach a [Cinemachine Storyboard](https://docs.unity3d.com/Packages/com.unity.cinemachine@3.0/manual/CinemachineStoryboard.html) extension to it. The extension overlays (our render texture) as if it were the camera view. The big advantage of using the storyboard is that any transitions will naturally fade the storyboard texture, which gives us our first look at a dissolve.
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/SimpleDissolve.gif"><img src="/assets/files/SpelunkyCam/SimpleDissolve.gif"></a>
+    <video muted autoplay loop playsinline>
+        <source src="/assets/files/SpelunkyCam/SimpleDissolve.mp4"  type="video/mp4"> 
+        Browser doesn't support videos
+    </video>
     <figcaption>Manual Dissolve from UpperCam to StoryboardCam </figcaption>
 </figure>
 
@@ -71,7 +80,10 @@ private void PositionStoryboardCam(CinemachineCamera destinationCam,
 Instead of having `storyboardCam` match the position and orthographic size of `destinationCam` exactly, we'll tweak the ortho size to be slightly bigger or smaller than the end camera. This starts to create the Spelunky zoom that we're looking for. If transitioning "down" or "into", `orthoOffset` should be positive, and negative when transitioning "up" or "out of".
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/HalfTransition.gif"><img src="/assets/files/SpelunkyCam/HalfTransition.gif"></a>
+    <video muted autoplay loop playsinline>
+        <source src="/assets/files/SpelunkyCam/HalfTransition.mp4"  type="video/mp4"> 
+        Browser doesn't support videos
+    </video>
     <figcaption>Cutting immediately to Storyboard from Upper (Source), then easing to Lower (Destination)</figcaption>
 </figure>
 
@@ -123,7 +135,10 @@ We align both transition cams using `sourceCam`, then apply separate ortho offse
 {: .notice}
 
 <figure>
-    <a href="/assets/files/SpelunkyCam/FullTransition.gif"><img src="/assets/files/SpelunkyCam/FullTransition.gif"></a>
+    <video muted autoplay loop playsinline>
+        <source src="/assets/files/SpelunkyCam/FullTransition.mp4"  type="video/mp4"> 
+        Browser doesn't support videos
+    </video>
     <figcaption>(Transition Brain) cutting immediately to transition start, then easing back to transition end</figcaption>
 </figure>
 

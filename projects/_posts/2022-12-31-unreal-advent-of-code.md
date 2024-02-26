@@ -19,7 +19,7 @@ Here are a few excerpts
 
 This puzzle involved calculating how a series of Rock Paper Scissors games would play out, given a predetermined strategy guide. The guide was a list of letter pairs like `[A Y] [B X] [C Z]` with letters corresponding to which shape each player would choose. The solution was calculated using a score based on game outcome and shape chosen.
 
-<figure class="align-center">
+<figure>
   <video width="100%" muted autoplay loop playsinline> 
     <source src="/assets/files/RochamboDay.mp4"  type="video/mp4">
     browser doesn't support videos
@@ -31,7 +31,7 @@ This puzzle involved calculating how a series of Rock Paper Scissors games would
 
 This puzzle involved finding matching "items" in sections of an "elf's rucksack." A rucksack was represented as a series of item characters like `vJrwpWtwJgWrhcsFMMfFFhFp`. Each matching item was scored based on its ASCII value, then summed for the solution.
 
-<figure class="align-center">
+<figure>
   <video width="100%" muted autoplay loop playsinline> 
     <source src="/assets/files/bouncingLettersDay.mp4"  type="video/mp4">
     browser doesn't support videos
@@ -43,7 +43,7 @@ This puzzle involved finding matching "items" in sections of an "elf's rucksack.
 
 This puzzle involved finding the "elf" with the highest calorie count among their snacks. Snack calorie counts were represented in a list with separators dividing each elf. Individual elf counts were summed, then solved for the max.
 
-<figure class="align-center">
+<figure>
   <video width="100%" muted autoplay loop playsinline> 
     <source src="/assets/files/variedSizeCubesDay.mp4"  type="video/mp4">
     browser doesn't support videos
