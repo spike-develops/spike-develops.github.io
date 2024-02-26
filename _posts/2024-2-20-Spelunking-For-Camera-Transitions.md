@@ -59,7 +59,7 @@ private void PositionStoryboardCam(CinemachineCamera destinationCam,
 
     var pos = destinationCam.State.GetFinalPosition();
     var rot = destinationCam.State.GetFinalOrientation();
-    //use ForceCameraPosition so Cinemachine internals stay happy.
+    
     storyboardCam.ForceCameraPosition(pos, rot);
 
     //offset storyboard ortho to create the zoom transition
@@ -75,7 +75,7 @@ Instead of having `storyboardCam` match the position and orthographic size of `d
     <figcaption>Cutting immediately to Storyboard from Upper (Source), then easing to Lower (Destination)</figcaption>
 </figure>
 
-After this we'll have a halfway transition that doesn't look great, so we need to get the other side working. 
+After this we'll have a halfway transition where only the destination appears to zoom, so we'll need to get the other side working. 
 
 #### Adding Brains to the Transition Camera
 Up till this point the Transition Camera (and therefore the RenderTexture that the `storyboardCam` displays) has been manually positioned to sit wherever `sourceCam` was.
@@ -167,7 +167,7 @@ transitionBrain.gameObject.SetActive(true);
 CinemachineCore.CameraDeactivatedEvent.AddListener(CamDeactivated);
 _transitionInProgress = true;
 ```
-In these lines, we do the important job of activating `transitionBrain` and it's *very real* camera. While we're *not* transitioning, we'll deactivate it in order to avoid waisting time rendering a texture that won't be seen.
+In these lines, we do the important job of activating `transitionBrain` and it's *very real* camera. While we're *not* transitioning, we'll deactivate it in order to avoid wasting time rendering a texture that won't be seen.
 
 The transition is technically finished once `storyboardCam` is no longer live. At that point, we can deactivate `transitionBrain` again. The good news is we can hook into Cinemachine's `CameraDeactivatedEvent`, to know exactly when that happens.
 

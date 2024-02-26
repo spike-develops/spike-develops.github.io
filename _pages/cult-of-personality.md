@@ -33,6 +33,16 @@ possessed_gallery:
     image_path: /assets/files/PossessedExample.png
     alt: "Possessed Player Perspective"
     title: "Perspective of the possessed player"
+
+
+feature_row:
+  - image_path: /assets/files/SpelunkyCam/SpelunkyExampleComplete.gif
+    alt: "Spelunky Transition Gif"
+    title: "Floor Transition System"
+    
+    url: /articles/spelunking-for-camera-transitions/
+    btn_label: "Read Article"
+    btn_class: "btn--primary"
 ---
 
 *Cult of Personality (CoP) is 5-8 player online multiplayer social deception game ala Among Us. Players play as a Cultist, working with their peers to perform a forbidden ritual, or a disillusioned Defector, trying to stop them using deceit, possession, and murder!*
@@ -73,4 +83,9 @@ Those requirements led me to build CoP's netcode, with server authority and clie
 Because it was important for CoP to support responsive, predicted actions on client, we needed to be able to rewind a player's state, then re-play inputs for players in case of a missed prediction. We also needed to ensure separation between input source, and actor state, to allow control swapping when possession happens, and for AI controlled NPC's like bats.
 
 All that factored into my decision to represent actor state with Hierarchical State Machines. I definitely recommend the whole book, but Robert Nystrom's [Game Programming Patterns](https://gameprogrammingpatterns.com/state.html#hierarchical-state-machines) was the jumping off point for my HSM implementation. There are also some super neat bonuses to HSM's, like situational behavior changes (holding death triggers for a round-end animation) being relatively painless, and super tiny state serialization.
+
+## Technical Articles
+More in-depth articles about some techniques I used in CoP!
+{% include feature_row type="left" %}
+
 
