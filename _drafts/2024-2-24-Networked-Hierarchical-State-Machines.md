@@ -2,7 +2,7 @@
 title: Networked Hierarchical State Machines
 excerpt: Discussing HSM's in the context of netcode
 header:
-    overlay_image: /assets/files/HSM/TorchHSM.png
+    overlay_image: /assets/files/HSM/PlayerHSM.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
 
 permalink: /articles/networked-hsms/
@@ -34,6 +34,11 @@ In Cult, I used Hierarchical state machines to describe all actor behaviour that
 <figure>
     <a href="/assets/files/HSM/TorchHSM.png"><img src="/assets/files/HSM/TorchHSM.png"></a>
     <figcaption>View of an active Torch's HSM, with the current states in blue </figcaption>
+</figure>
+
+<figure>
+    <a href="/assets/files/HSM/PlayerHSM.png"><img src="/assets/files/HSM/PlayerHSM.png"></a>
+    <figcaption>Cult's final Player HSM, including all ghost/possession states </figcaption>
 </figure>
 
 Along with allowing for great flexibility over granular changes in behaviour, HSM's also gave some nice benefits on the networking side. 
@@ -74,9 +79,7 @@ public int WalkTree(int depthMul = 1)
 }
 ```
 
-There are some "stateful" states however. Things like attacks, stuns, and interacting all have predefined end points. We can serialize those by adding a FixedFrame associated with a level
-
-At each level of the tree, we serialize the child decision, so if there are 
+We can't get around having some "stateful" nodes however. Things like attacks, stuns, and interacting all have instance specific start points we need to track. We can serialize that
 
 
 
