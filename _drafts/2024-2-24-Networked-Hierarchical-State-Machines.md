@@ -89,13 +89,36 @@ public int WalkTree(int depthMul = 1)
 }
 ```
 
-We can't get around having some "stateful" nodes however. Things like attacks, stuns, and interacting all have instance specific info points we need to track. We can serialize that
-
-
-
-
-
 To deserialize, we walk the tree to rebuild it, decoding our header into the correct child state at each level. 
+
+## Stateful Nodes
+
+Unfortunately, we can't get by with *just* serializing the path through the tree. Timed nodes like attacks need to know when they started, and nodes like interaction need to know who/what they're interacting with. 
+
+The good news is that this stateful node info can be serialized during the initial walk through the tree with very little overhead.
+
+//TODO show while serializing 
+
+Any Stateful node can implement a simple interface that 
+
+
+```cs
+public interface IStatefulNode
+{
+    void DeserializeState(byte[] bytes, ref int currentByte);
+    
+    int GetSize();
+
+    void SerializeState(byte[] bytes, ref int currentByte);
+}
+```
+
+```cs
+public byte[] Serialize()
+{
+    
+}
+```
 
 
 ## Rollback
@@ -173,22 +196,13 @@ void RecurDeser(byte[] bytes, int byteIndex, int[] leafPath, int depth)
     //deserialize add'l state if necessary
     if(this is IStatefulNode sNode)
         sNode.DeserializeState(bytes, ref byteIndex);
-    
-    ActivateNode();
 
     //end on leaf
     if(_subStates.Count == 0)
         return;
     
-    var curChildIndex = _subStates.IndexOf(_curSubState);
-    var nextChildIndex = leafPath[depth];
-    //if serialized child is different, deactivate old one
-    if(curChildIndex != nextChildIndex)
-    {
-        _curSubState.DeactivateNode();
-        _curSubState = _subStates[nextChildIndex];
-    }
-
+    //update the current child node
+    _curSubState = _subStates[leafPath[depth]];
     _curSubState.RecurDeser(bytes, byteIndex, leafPath, depth+1);
 }
 ```
