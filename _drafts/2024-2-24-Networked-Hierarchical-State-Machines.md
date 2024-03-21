@@ -106,12 +106,25 @@ As we walk down the tree, we also check with each newly chosen child to see if i
 
 //TODO also make sure we tell them to save their events per frame
 
+
+
 The other nice thing about networked HSM's is how easy it is to implement rollback using them. Because a single complex state diagram can be serialized into a few bytes, we can keep a rolling array of the last X states as byte arrays, and simply deserialize, and re-run inputs on the state machine whenever we need to rectify or re-predict!
+
+```cs
+void RecurDeser(byte[] bytes, int byteIndex, int[] leafPath, int depth)
+{
+    //deserialize add'l state if necessary
+    if(this is IStatefulNode sNode)
+        sNode.DeserializeState(bytes, ref byteIndex);
+
+    //etc...
+```
 
 
 ## Even better Tree serialization
 If you can ensure that each node in the HSM only ever has one parent, (and therefore ensure that there is only one way back to the root node from any leaf node), we can instead do some pre processing, and serialize current state in reference to the "leaf node index" 
 
+First, we pre process, traversing through the tree and keeping track of the index paths taken. then we store those choices inside an array of "leaf node paths" that remembers the direction to any given leaf node.
 ```cs
 private void PopulateLeafData(List<int[]> leafCache, 
     Dictionary<HSNode, index> leafMap, List<int> currentRoute)
@@ -135,12 +148,51 @@ private void PopulateLeafData(List<int[]> leafCache,
         currentRoute.RemoveAt(currentRoute.Count-1)
     }
 }
-
 ```
-First, we pre process, traversing through the tree and keeping track of the index paths taken. then we store those choices inside an array of "leaf node paths" that remembers the direction to any given leaf node.
 
 Then its just a matter of serializing the leaf index and looking up the path on deserialization! 
 //TODO CODE 
+
+```cs
+private SerializeHSM()
+{
+
+}
+```
+
+```cs
+//called on root
+public void Deserialize(byte[] bytes, int byteIndex)
+{
+    int leafIndex = bytes[i];
+    ReDeserialize(bytes, byteIndex+1, leafCache[leafIndex], 0)
+}
+
+void RecurDeser(byte[] bytes, int byteIndex, int[] leafPath, int depth)
+{
+    //deserialize add'l state if necessary
+    if(this is IStatefulNode sNode)
+        sNode.DeserializeState(bytes, ref byteIndex);
+    
+    ActivateNode();
+
+    //end on leaf
+    if(_subStates.Count == 0)
+        return;
+    
+    var curChildIndex = _subStates.IndexOf(_curSubState);
+    var nextChildIndex = leafPath[depth];
+    //if serialized child is different, deactivate old one
+    if(curChildIndex != nextChildIndex)
+    {
+        _curSubState.DeactivateNode();
+        _curSubState = _subStates[nextChildIndex];
+    }
+
+    _curSubState.RecurDeser(bytes, byteIndex, leafPath, depth+1);
+}
+```
+
 This also has the added benefit of completely eliminating any issues stemming from an unbalanced tree, since deep vs wide leaf nodes aren't treated differently
 
 ## Optimizations
