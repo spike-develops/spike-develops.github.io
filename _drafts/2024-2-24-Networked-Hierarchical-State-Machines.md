@@ -73,23 +73,39 @@ Ideally we find a way to keep an efficient packing system that is behaviour agno
 
 TODO this probably needs more intro/shouldn't be the first code we see
 ```cs
-public int WalkTree(int depthMul = 1)
+public int SerNode(int depthMul = 1)
 {
-    //get the index of current child. (null could have an index)
-    var childIndex = _subStates.IndexOf(_curSubState);
-
-    var result = 0;
-    if (_curSubState != null)
-    {
-        result = _curSubState.WalkTree(depthMul * _subStates.Count);
-    }
+    //stop at leaf node
+    if(_childIndex == -1)
+        return 0;
+    
+    var r = _subNodes[_childIndex].SerNode(depthMul*_subNodes.Count);
     
     //encode this child index using the depth multiplier
-    return result + childIndex * depthMul;
+    return r + _childIndex * depthMul;
+}
+
+public void SerializeHSM(StreamBuffer outStream)
+{
+    //leave space for header for after serialization
+    var headerPos = outStream.Position;
+    outStream.Position++;
+
+    var header = RootNode.SerNode(outStream);
+
+    //TODO confirm header is smaller than max size
+
+    //go back and set the header
+    var finalPos = outStream.Position;
+    outStream.Position = headerPos;
+    outStream.WriteByte(header);
+    outStream.Position = finalPos;
 }
 ```
 
 To deserialize, we walk the tree to rebuild it, decoding our header into the correct child state at each level. 
+
+//TODO show deserialization
 
 ## Stateful Nodes
 
@@ -97,33 +113,41 @@ Unfortunately, we can't get by with *just* serializing the path through the tree
 
 The good news is that this stateful node info can be serialized during the initial walk through the tree with very little overhead.
 
-//TODO show while serializing 
-
-Any Stateful node can implement a simple interface that 
-
-
+First, any Stateful node can implement an interface that marks itself as such.
 ```cs
 public interface IStatefulNode
 {
-    void DeserializeState(byte[] bytes, ref int currentByte);
-    
-    int GetSize();
+    void DeSerState(StreamBuffer inStream);
 
-    void SerializeState(byte[] bytes, ref int currentByte);
+    void SerState(StreamBuffer outStream);
 }
 ```
+Then, instead of just building the header in `SerNode()` we'll send our streamBuffer along, and from root to leaf let any stateful nodes serialize its extra info
 
-```cs
-public byte[] Serialize()
+```cs 
+void SerNode(StreamBuffer outStream, int depthMul = 1)
 {
-    
-}
-```
+    //if we're stateful, append our info
+    if(this is IStatefulNode sNode)
+        sNode.SerState(outStream);
 
+    //... 
+```
+On the other end, we add the matching method, letting stateful nodes pull the next x bytes as required, going 
+
+```cs 
+void DeSerNode(StreamBuffer inStream,//TODO
+{
+    //deserialize add'l state if necessary
+    if(this is IStatefulNode sNode)
+        sNode.DeSerState(inStream);
+
+    //...
+```
+You'll notice that *because* the Hierarchy of the state machine implies a serialized order (from root to leaf), we don't have to waste bits on flags noting the "next X bytes are for an attack timestamp" and we'll never waste bits on what's *not* there either.
 
 ## Rollback
 
-As we walk down the tree, we also check with each newly chosen child to see if its "stateful" and because we always serialize down the tree, we just let the current node read the next X bits however it needs, and move our index forward. This means there's no extra bits waisted on explaining how to deserialize the extra stateful bits.
 
 //TODO probably need to describe how we "run" inputs on an HSM at the top. That way it makes sense once we get here
 
@@ -134,13 +158,7 @@ As we walk down the tree, we also check with each newly chosen child to see if i
 The other nice thing about networked HSM's is how easy it is to implement rollback using them. Because a single complex state diagram can be serialized into a few bytes, we can keep a rolling array of the last X states as byte arrays, and simply deserialize, and re-run inputs on the state machine whenever we need to rectify or re-predict!
 
 ```cs
-void RecurDeser(byte[] bytes, int byteIndex, int[] leafPath, int depth)
-{
-    //deserialize add'l state if necessary
-    if(this is IStatefulNode sNode)
-        sNode.DeserializeState(bytes, ref byteIndex);
 
-    //etc...
 ```
 
 
@@ -152,7 +170,7 @@ First, we pre process, traversing through the tree and keeping track of the inde
 private void PopulateLeafData(List<int[]> leafCache, 
     Dictionary<HSNode, index> leafMap, List<int> currentRoute)
 {
-    if(_subStates.Count == 0)
+    if(_subNodes.Count == 0)
     {
         //save the currentRoute into the leaf cache
         leafCache.Add(currentRoute.ToArray())
@@ -162,11 +180,11 @@ private void PopulateLeafData(List<int[]> leafCache,
     }
 
     //we know we're not a leaf at this point
-    for(int i = 0; i<_subStates.Count; i++)
+    for(int i = 0; i<_subNodes.Count; i++)
     {
         //save this child index to the current route
         currentRoute.Add(i);
-        _subStates[i].PopulateLeafData(leafCache, leafMap, currentRoute);
+        _subNodes[i].PopulateLeafData(leafCache, leafMap, currentRoute);
         //remove this index after processing
         currentRoute.RemoveAt(currentRoute.Count-1)
     }
@@ -185,25 +203,25 @@ private SerializeHSM()
 
 ```cs
 //called on root
-public void Deserialize(byte[] bytes, int byteIndex)
+public void Deserialize(StreamBuffer inStream)
 {
-    int leafIndex = bytes[i];
-    ReDeserialize(bytes, byteIndex+1, leafCache[leafIndex], 0)
+    int leafIndex = inStream.ReadByte();
+    DeSerNode(inStream, leafCache[leafIndex], 0)
 }
 
-void RecurDeser(byte[] bytes, int byteIndex, int[] leafPath, int depth)
+void DeSerNode(inStream, int[] leafPath, int depth)
 {
     //deserialize add'l state if necessary
     if(this is IStatefulNode sNode)
-        sNode.DeserializeState(bytes, ref byteIndex);
+        sNode.DeserializeState(inStream);
 
-    //end on leaf
-    if(_subStates.Count == 0)
+    //stop on leaf node
+    if(_childIndex == -1)
         return;
     
     //update the current child node
-    _curSubState = _subStates[leafPath[depth]];
-    _curSubState.RecurDeser(bytes, byteIndex, leafPath, depth+1);
+    _childIndex = leafPath[depth];
+    _subNodes[_childIndex].DeSerNode(inStream, leafPath, depth+1);
 }
 ```
 
