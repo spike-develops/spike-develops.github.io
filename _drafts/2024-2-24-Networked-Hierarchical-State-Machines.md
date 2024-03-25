@@ -59,12 +59,11 @@ To achieve that in an HSM-less world, we *could* add a bunch of behaviour specif
 On the flip side, an HSM bakes all of these behaviour exclusions into its structure, so instead of designating specific bits for conditions like `IsSneaking` or `IsStunned`, we can just serialize our "walk" down the tree.
 
 <figure>
-    <a href="/assets/files/HSM/PlayerHSM.png"><img src="/assets/files/HSM/PlayerHSM.png"></a>
-    <figcaption>Cult's final Player HSM, including all ghost/possession states </figcaption>
+    <a href="/assets/files/HSM/TorchSelections.png"><img src="/assets/files/HSM/TorchSelections.png"></a>
+    <figcaption>Series of child indexes that represent this Torch's current state</figcaption>
 </figure>
-//TODO simple image of choosing
 
-Starting at the root, we can encode each level as a decision between its possible children. Here the decisions are `2nd of 5`, `1st of 2`, `3rd of 4`. We then multiply these choices together based on tree depth to create a "header" that encodes the HSM's current state.
+Starting at the root, we encode each child as an index out of possible children. Here the decisions are `2nd of 3`, `1st of 1`, `2nd of 2`, `1st of 2`, and `1st of 1`. We then multiply these choices together based on node depth to create a "header" that encodes the HSM's current state.
 
 ```cs
 public void SerializeHSM(StreamBuffer outStream)
@@ -86,18 +85,16 @@ int SerNode(int depthMul = 1)
     return h + _childIndex * depthMul;
 }
 ```
-//TODO talk about what the max is
+`depthMul` is the product of every `_subNodes.Count` above it in the hierarchy, and ensures that each level's `_childIndex` is encoded on a separate scale. The caveat here is that the header's magnitude can vary significantly depending on which subtree the current state ends up in. 
 
 <figure>
-    <a href="/assets/files/HSM/PlayerHSM.png"><img src="/assets/files/HSM/PlayerHSM.png"></a>
-    <figcaption>Cult's final Player HSM, including all ghost/possession states </figcaption>
+    <a href="/assets/files/HSM/PlayerSelections.png"><img src="/assets/files/HSM/PlayerSelections.png"></a>
+    <figcaption>Worst-case header size for the Player HSM in Cult</figcaption>
 </figure>
-//TODO image of large complex tree and total math
 
-//TODO do a note that we'll make this better later
+For Cult's HSM's the worst-case sits below 2 bytes. These limits are also per HSM, so a smaller HSM's header requirements can come in under a byte pretty frequently.
 
-To deserialize, we walk the tree to rebuild it, decoding our header into the correct child state at each level. 
-
+To deserialize, we walk back down the tree using the header to decode the next child index as we go.
 ```cs
 public void DeserializeHSM(StreamBuffer inStream)
 {
@@ -121,7 +118,11 @@ void DeSerNode(int header, int depthMul = 1)
     _subNodes[_childIndex].DeSerNode(header-moddedHeader, nextDepthMul);
 }
 ```
-TODO maybe go over this algo?
+We use the fact that each child index was scaled by `depthMul` to slice the header back into its individual levels, and keep going till we hit a leaf. 
+
+
+**Improved Serialization -** this technique allows nodes with multiple parents to be serialized without issue. If that isn't needed, an even more efficient system is described later
+{: .notice}
 
 ## Stateful Nodes
 
@@ -160,7 +161,7 @@ void DeSerNode(StreamBuffer inStream, int header, int depthMul = 1)
 
     //...
 ```
-You'll notice that *because* the Hierarchy of the state machine implies a serialized order (from root to leaf), we don't have to waste bits on flags noting the "next X bytes are for an attack timestamp" and we'll never waste bits on what's *not* there either.
+Because the Hierarchy of the state machine implies a serialized order (from root to leaf), we don't have to waste bits on flags noting the "next X bytes are for an attack timestamp" and we'll never waste bits on what's *not* there either.
 
 ## Rollback
 
