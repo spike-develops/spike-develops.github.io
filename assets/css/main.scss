@@ -79,4 +79,8 @@ figure {
     -webkit-transition: $global-transition;
     transition: $global-transition;
   }
+
+  figcaption{
+    margin-bottom: 0;
+  }
 }
