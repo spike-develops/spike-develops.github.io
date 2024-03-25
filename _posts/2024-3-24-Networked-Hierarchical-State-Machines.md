@@ -55,7 +55,7 @@ public void SerializeHSM(StreamBuffer outStream)
 {
     //encode the header
     var header = RootNode.SerNode();
-    outStream.WriteByte(header);
+    outStream.WriteUShort(header);
 }
 
 int SerNode(int depthMul = 1)
@@ -84,7 +84,7 @@ To deserialize, we walk back down the tree using the header to decode the next c
 public void DeserializeHSM(StreamBuffer inStream)
 {
     //decode the header
-    var header = inStream.ReadByte();
+    var header = inStream.ReadUShort();
     RootNode.DeSerNode(header);
 }
 
@@ -158,7 +158,7 @@ It also implies that given the same starting state, and the same n event inputs,
 private void RollbackAndRunEvents(StreamBuffer inStream, Queue<HSMEvents> inputQueue)
 {
     //rollback by deserializing
-     var header = inStream.ReadByte();
+     var header = inStream.ReadUShort();
     RootNode.DeSerNode(inStream, header);
 
     //re-predict all input events between the confirmed state, and our current frame
@@ -269,4 +269,4 @@ void DeSerNode(StreamBuffer inStream, int[] leafPath, int depth = 0)
     _subNodes[_childIndex].DeSerNode(inStream, leafPath, depth+1);
 }
 ```
-This also has the added benefit of eliminating lots of issues stemming from an unbalanced tree, since leaf index has no basis on depth vs width.
+This also has the added benefit of eliminating lots of issues stemming from an unbalanced tree, since leaf index is unrelated to depth/width.
