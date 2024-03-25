@@ -14,47 +14,32 @@ tags:
  - HSM
 ---
 
-Hi Okay writing this up
+Hierarchical State Machines are a spin on typical finite state machines, where you can be in multiple states within a tree-like *Hierarchy* at any givin time. For a brief overview of FSM's and their hierarchical counterparts, you can't go wrong with [Game Programming Patterns.](https://gameprogrammingpatterns.com/state.html)
 
-//Explain how HSM's have a bubble up events?
-what is the bare basis for this article
-
-an HSM implementation the bubbles up events from the child to root, where transition(s) 
-
-
-//QUICK explanation of a non networked HSM
-Hierarchical State Machines are a spin on a typical state machine, where you can be in multiple states at once. The advantage being that 
-
-Hierarchical state machines can be thought about as finite State machines with  tree-like structures, where all nodes from the active child to the root node are "active" at once.
-
-The advantage they have over a typical finite state machine is that when describing a very complex system with lots of disparate stateful-ness, each individual node can stay relatively simple and compact, and behaviour can be easily modified by adjusting
-
-In Cult, I used Hierarchical state machines to describe all actor behaviour that required anything more than single nested conditional logic. IE, Doors, with just a state of Locked/Unlocked used our NetState system outright, while torches, with behaviour like ticked glows and time queued "burns", was described using an HSM
+In Cult, I used HSM's to describe all actor behaviour that required anything more than single nested conditional logic. IE, Doors, with just a state of Locked/Unlocked used our NetState system outright, while torches, with behaviour like ticked glows and time queued "burns", was described using an HSM
 
 <figure>
     <a href="/assets/files/HSM/TorchHSM.png"><img src="/assets/files/HSM/TorchHSM.png"></a>
-    <figcaption>View of an active Torch's HSM, with the current states in blue </figcaption>
+    <figcaption>View of an active Torch's HSM, with the current nodes in blue </figcaption>
 </figure>
 
-
-
-
+The advantage they have over a typical finite state machine is that when describing a very complex system with lots of disparate stateful-ness, each individual node can stay relatively simple and compact, and behaviour can be easily modified by adjusting the hierarchy and its transitions, as apposed to individual states.
 
 Along with allowing for great flexibility over granular changes in behaviour, HSM's also gave some nice benefits on the networking side. The clearest of those benefits is how easily we can serialize the current state of machine.
 
 ## Serialization
 In all games there are certain conditions an actor may be in at any given time. Here's a few from Cult:
-* Moving
-* Sneaking
-* interacting,
-* Invulnerability -in elevators & cutscenes
-* Timed Stuns,
-* Light and Heavy Attacks -with various movement restrictions
-* Possession -as ghost
+* **Moving**
+* **Sneaking**
+* **interacting**,
+* **Invulnerability** -in elevators & cutscenes
+* **Timed Stuns**,
+* **Light and Heavy Attacks** -with various movement restrictions
+* **Possession** -as ghost
 
 Lots of these behaviors are mutually exclusive (while interacting, we know the player can't be stunned or sneaking), but some are valid combinations that can overlap (players can move while light attacking). In an ideal world, we'd determine which states are exclusive and never send that info over the network. Conversely we'd want to guarantee that valid combinations are always sent. 
 
-To achieve that in an HSM-less world, we *could* add a bunch of behaviour specific logic to our bitpacker. IE "bit *x* refers to `IsSneaking` if an earlier bit *y* referring to `IsStunned` was true" but what happens if later on a change in actor behaviour affects these exclusion rules? If all of sudden "sneaking while interacting" is a valid combination that lets you interact silently, we'll need to modify our networking logic along with any gameplay change. icky.
+To achieve that in an HSM-less world, we *could* add a bunch of behaviour specific logic to our bitpacker. IE "bit *x* refers to `IsSneaking` if an earlier bit *y* referring to `IsStunned` was true" but what happens if later on a change in actor behaviour affects these exclusion rules? If all of sudden "sneaking while interacting" is a valid combination that lets you interact silently, we'll need to modify our networking logic along with any gameplay change. *icky*.
 
 On the flip side, an HSM bakes all of these behaviour exclusions into its structure, so instead of designating specific bits for conditions like `IsSneaking` or `IsStunned`, we can just serialize our "walk" down the tree.
 
@@ -109,7 +94,7 @@ void DeSerNode(int header, int depthMul = 1)
     if(_childIndex == -1)
         return;
     
-    var nextDepthMul = _substates.Count * depthMul;
+    var nextDepthMul = _subNodes.Count * depthMul;
     //slice off the relevant header
     var moddedHeader = header % nextDepthMul;
     //bring it back within the range of child indexes
@@ -150,8 +135,7 @@ int SerNode(StreamBuffer outStream, int depthMul = 1)
 
     //... 
 ```
-On the other end, we add the matching method, letting stateful nodes pull the next x bytes as required, going 
-
+On the other end, we add the matching method, letting stateful nodes pull the next x bytes as required. 
 ```cs 
 void DeSerNode(StreamBuffer inStream, int header, int depthMul = 1)
 {
@@ -163,21 +147,21 @@ void DeSerNode(StreamBuffer inStream, int header, int depthMul = 1)
 ```
 Because the Hierarchy of the state machine implies a serialized order (from root to leaf), we don't have to waste bits on flags noting the "next X bytes are for an attack timestamp" and we'll never waste bits on what's *not* there either.
 
-## Rollback
+## Rollback and re-prediction
+Hierarchical State Machines adhere to the same core principles as their finite counterparts. 
 
+*currentState + input = nextState*
 
-//TODO probably need to describe how we "run" inputs on an HSM at the top. That way it makes sense once we get here
-
-//TODO also make sure we tell them to save their events per frame
+It also implies that given the same starting state, and the same n event inputs, the final state of two identical machines will match. Using that concept, rollback and re-prediction of an HSM can be boiled down to deserializing a confirmed state from the server, then replaying input events from a rolling input buffer. 
 
 ```cs 
-
-//dont think this is a fantastic example...
-//maybe we specify that this could be on the client as the repredict based on server sending them updated states
 private void RollbackAndRunEvents(StreamBuffer inStream, Queue<HSMEvents> inputQueue)
 {
-    RootNode.DeSerNode(inStream);
+    //rollback by deserializing
+     var header = inStream.ReadByte();
+    RootNode.DeSerNode(inStream, header);
 
+    //re-predict all input events between the confirmed state, and our current frame
     while(inputQueue.Count > 0)
     {
         RootNode.RunEvent(inputQueue.Dequeue());
@@ -186,15 +170,23 @@ private void RollbackAndRunEvents(StreamBuffer inStream, Queue<HSMEvents> inputQ
 }
 ```
 
-The other nice thing about networked HSM's is how easy it is to implement rollback using them. Because a single complex state diagram can be serialized into a few bytes, we can keep a rolling array of the last X states as byte arrays, and simply deserialize, and re-run inputs on the state machine whenever we need to rectify or re-predict!
+//TODO how do i transition from that to enterExit Events
 
+In Addition to typical Enter and Exit delegates that trigger when the HSM transitions, extra delegates specific to network contexts can also be pretty useful. 
+- **Enter/Exit due to deserialization** - allows for ignoring effects that get published in other ways
+- **Enter/Exit from predicted events** - allows for ignoring effects that can't be predicted
 
 ## Even better Tree serialization
-If you can ensure that each node in the HSM only ever has one parent, (and therefore ensure that there is only one way back to the root node from any leaf node), we can instead do some pre processing, and serialize current state in reference to the "leaf node index" 
+If you can ensure that each node in the HSM only ever has one parent, (and therefore ensure that there is only one way back to the root node from any leaf node). We can reduce our serialized header size by describing the HSM based solely on our current leaf node's "index".
 
-//TODO image of the example of counting each leaf node and showing the reduction in size
+<figure>
+    <a href="/assets/files/HSM/LeafSelections.png"><img src="/assets/files/HSM/LeafSelections.png"></a>
+    <figcaption>max header for player HSM using leaf index</figcaption>
+</figure>
+This can be a pretty significant size-reduction! For Cult's Player HSM we halve our bit requirement, and would need to more-than-double the size of the HSM before we'd need a second byte.
 
-First, we pre process, traversing through the tree and keeping track of the index paths taken. then we store those choices inside an array of "leaf node paths" that remembers the direction to any given leaf node.
+The first step to this technique is doing a bit of pre-processing to actually "index" all the possible leaves.
+During Init, we'll start with a depth-first tree traversal.
 ```cs
 private void PopulateLeafData(List<int[]> leafCache, 
     Dictionary<HSNode, index> leafMap, List<int> currentRoute)
@@ -219,26 +211,50 @@ private void PopulateLeafData(List<int[]> leafCache,
     }
 }
 ```
+During our traversal, we keep track of the child indexes we've visited inside `currentRoute`. When we hit a leaf node, we copy that route into `leafCache`, and map the leaf->index in `leafMap`.
 
-Then its just a matter of serializing the leaf index and looking up the path on deserialization! 
-//TODO CODE 
-
+During serialize, we use `leafMap` to get the current leaf index, and serialize it as our header.
 ```cs
-private SerializeHSM()
+public void SerializeHSM(StreamBuffer outStream)
 {
+    //leave space for header for after serialization
+    var headerPos = outStream.Position;
+    outStream.Position++;
 
+    var leafNode = RootNode.SerNode(outStream);
+ 
+    //go back to set the header
+    var finalPos = outStream.Position;
+    outStream.Position = headerPos;
+    //write the leafIndex
+    outStream.WriteByte(leafMap[leafNode]);
+    outStream.Position = finalPos;
+}
+
+HSNode SerNode(StreamBuffer outStream)
+{
+    //if we're stateful, append our info
+    if(this is IStatefulNode sNode)
+        sNode.SerState(outStream);
+
+    //stop at leaf node and return its reference
+    if(_childIndex == -1)
+        return this;
+    
+    return _subNodes[_childIndex].SerNode(outStream);
 }
 ```
+`SerNode()` becomes even simpler because of the pre-processing. Now it just needs to return a reference to the leafNode at the base case.
 
+On deserialize, we use `leafCache` to retrieve the cached route we need to follow down the hierarchy. 
 ```cs
-//called on root
 public void DeserializeHSM(StreamBuffer inStream)
 {
     int leafIndex = inStream.ReadByte();
-    DeSerNode(inStream, leafCache[leafIndex], 0)
+    DeSerNode(inStream, leafCache[leafIndex])
 }
 
-void DeSerNode(StreamBuffer inStream, int[] leafPath, int depth)
+void DeSerNode(StreamBuffer inStream, int[] leafPath, int depth = 0)
 {
     //deserialize add'l state if necessary
     if(this is IStatefulNode sNode)
@@ -253,30 +269,4 @@ void DeSerNode(StreamBuffer inStream, int[] leafPath, int depth)
     _subNodes[_childIndex].DeSerNode(inStream, leafPath, depth+1);
 }
 ```
-
-This also has the added benefit of completely eliminating any issues stemming from an unbalanced tree, since deep vs wide leaf nodes aren't treated differently
-
-## Optimizations
-TODO should put int optimizations as I think of them in just text form.
-
-Further optimization:
-Once we get to a point where we only need to describe
-
-
-
-public void SerializeHSM(StreamBuffer outStream)
-{
-    //leave space for header for after serialization
-    var headerPos = outStream.Position;
-    outStream.Position++;
-
-    var header = RootNode.SerNode(outStream);
-
-    //TODO confirm header is smaller than max size
-
-    //go back and set the header
-    var finalPos = outStream.Position;
-    outStream.Position = headerPos;
-    outStream.WriteByte(header);
-    outStream.Position = finalPos;
-}
+This also has the added benefit of eliminating lots of issues stemming from an unbalanced tree, since leaf index has no basis on depth vs width.
