@@ -1,6 +1,6 @@
 ---
 title: Networked Hierarchical State Machines
-excerpt: Discussing HSM's in the context of netcode
+excerpt: HSM implementation in the context of netcode
 header:
     overlay_image: /assets/files/HSM/PlayerHSMReduced.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
@@ -23,9 +23,9 @@ In Cult, I used HSM's to describe all actor behaviour that required anything mor
     <figcaption>View of an active Torch's HSM, with the current nodes in blue </figcaption>
 </figure>
 
-The advantage they have over a typical finite state machine is that when describing a very complex system with lots of disparate stateful-ness, each individual node can stay relatively simple and compact, and behaviour can be easily modified by adjusting the hierarchy and its transitions, as apposed to individual states.
+The advantage they have over a typical finite state machine is apparent when describing complex behaviour with lots of disparate stateful-ness. Each individual node can stay relatively simple and compact, and behaviour can be easily modified by adjusting the hierarchy and its transitions, as apposed to individual states.
 
-Along with allowing for great flexibility over granular changes in behaviour, HSM's also gave some nice benefits on the networking side. The clearest of those benefits is how easily we can serialize the current state of machine.
+Along with allowing for flexibility over granular changes in behaviour, HSM's also gave some nice benefits on the networking side. The clearest of those benefits is how easily we can serialize the current state of machine.
 
 code shown omits things like input sanitization for readability. In a production environment, always assume packets are malicious and check for valid ranges!
 {: .notice}
@@ -34,9 +34,9 @@ code shown omits things like input sanitization for readability. In a production
 In all games there are certain conditions an actor may be in at any given time. Here's a few from Cult:
 * **Moving**
 * **Sneaking**
-* **interacting**,
+* **interacting**
 * **Invulnerability** -in elevators & cutscenes
-* **Timed Stuns**,
+* **Timed Stuns**
 * **Light and Heavy Attacks** -with various movement restrictions
 * **Possession** -as ghost
 
