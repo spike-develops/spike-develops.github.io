@@ -1,6 +1,6 @@
 ---
 title: Networked Hierarchical State Machines
-excerpt: HSM implementation in the context of netcode
+excerpt: Discussing HSM's in the context of netcode
 header:
     overlay_image: /assets/files/HSM/PlayerHSMReduced.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
