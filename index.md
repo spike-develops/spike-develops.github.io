@@ -17,14 +17,22 @@ feature_row_COP:
     btn_class: "btn--primary"
 
 feature_row_Articles:
+  - title: "Technical Articles"
+
   - image_path: /assets/files/SpelunkyCam/SpelunkyExampleComplete.gif
     alt: "Spelunky Transition Gif"
-    title: "Technical Articles"
+    title: "Spelunky Transition"
     excerpt: How I recreated Spelunky 2's transition system
     url: /articles/spelunking-for-camera-transitions/
     btn_label: "Read Article"
     btn_class: "btn--primary"
-
+  - image_path: /assets/files/HSM/TorchHSM.png
+    alt: "Torch HSM"
+    title: "Networked HSMs"
+    excerpt: Netcode with hierarchical state machines
+    url: /articles/networked-hsms/
+    btn_label: "Read Article"
+    btn_class: "btn--primary"
 ---
 
 {% include feature_row id="feature_row_COP" type="left" %}
@@ -43,4 +51,4 @@ feature_row_Articles:
 {% include custom_feature_single.html %}
 </div>
 
-{% include feature_row id="feature_row_Articles" type="left" %}
+{% include feature_row id="feature_row_Articles" %}

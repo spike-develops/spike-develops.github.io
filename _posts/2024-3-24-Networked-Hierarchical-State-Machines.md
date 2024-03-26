@@ -4,6 +4,7 @@ excerpt: Discussing HSM's in the context of netcode
 header:
     overlay_image: /assets/files/HSM/PlayerHSMReduced.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
+    teaser: /assets/files/HSM/TorchHSM.png
 
 permalink: /articles/networked-hsms/
 author_profile: true

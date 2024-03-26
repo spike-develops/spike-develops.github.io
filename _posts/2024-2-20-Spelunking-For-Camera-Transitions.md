@@ -4,6 +4,7 @@ excerpt: Replicating the transition with Cinemachine and render textures
 header:
     overlay_image: /assets/files/SpelunkyCam/ViewportExample.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
+    teaser: /assets/files/SpelunkyCam/LowerExample.png
 
 permalink: /articles/spelunking-for-camera-transitions/
 author_profile: true
