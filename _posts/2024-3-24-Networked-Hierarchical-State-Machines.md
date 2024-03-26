@@ -2,7 +2,7 @@
 title: Networked Hierarchical State Machines
 excerpt: Discussing HSM's in the context of netcode
 header:
-    overlay_image: /assets/files/HSM/PlayerHSM.png
+    overlay_image: /assets/files/HSM/PlayerHSMReduced.png
     overlay_filter: linear-gradient(rgba(0, 0, 0, .8),#252a34)
 
 permalink: /articles/networked-hsms/
@@ -14,7 +14,7 @@ tags:
  - HSM
 ---
 
-Hierarchical State Machines are a spin on typical finite state machines, where you can be in multiple states within a tree-like *Hierarchy* at any givin time. For a brief overview of FSM's and their hierarchical counterparts, you can't go wrong with [Game Programming Patterns.](https://gameprogrammingpatterns.com/state.html)
+Hierarchical State Machines are a spin on finite state machines, where you can be in multiple states within a tree-like *Hierarchy* at any givin time. For a brief overview of FSM's and their hierarchical counterparts, you can't go wrong with [Game Programming Patterns.](https://gameprogrammingpatterns.com/state.html)
 
 In Cult, I used HSM's to describe all actor behaviour that required anything more than single nested conditional logic. IE, Doors, with just a state of Locked/Unlocked used our NetState system outright, while torches, with behaviour like ticked glows and time queued "burns", was described using an HSM
 
@@ -26,6 +26,9 @@ In Cult, I used HSM's to describe all actor behaviour that required anything mor
 The advantage they have over a typical finite state machine is that when describing a very complex system with lots of disparate stateful-ness, each individual node can stay relatively simple and compact, and behaviour can be easily modified by adjusting the hierarchy and its transitions, as apposed to individual states.
 
 Along with allowing for great flexibility over granular changes in behaviour, HSM's also gave some nice benefits on the networking side. The clearest of those benefits is how easily we can serialize the current state of machine.
+
+code shown omits things like input sanitization for readability. In a production environment, always assume packets are malicious and check for valid ranges!
+{: .notice}
 
 ## Serialization
 In all games there are certain conditions an actor may be in at any given time. Here's a few from Cult:
@@ -147,32 +150,15 @@ void DeSerNode(StreamBuffer inStream, int header, int depthMul = 1)
 ```
 Because the Hierarchy of the state machine implies a serialized order (from root to leaf), we don't have to waste bits on flags noting the "next X bytes are for an attack timestamp" and we'll never waste bits on what's *not* there either.
 
-## Rollback and re-prediction
+## Rollback and Re-Prediction
 Hierarchical State Machines adhere to the same core principles as their finite counterparts. 
 
 *currentState + input = nextState*
 
-It also implies that given the same starting state, and the same n event inputs, the final state of two identical machines will match. Using that concept, rollback and re-prediction of an HSM can be boiled down to deserializing a confirmed state from the server, then replaying input events from a rolling input buffer. 
+This implies that given the same starting state, and the same n event inputs, the final state of two identical machines will match. Using that concept, rollback and re-prediction of an HSM can be boiled down to deserializing a confirmed state from the server, then replaying input events from a rolling input buffer. 
 
-```cs 
-private void RollbackAndRunEvents(StreamBuffer inStream, Queue<HSMEvents> inputQueue)
-{
-    //rollback by deserializing
-     var header = inStream.ReadUShort();
-    RootNode.DeSerNode(inStream, header);
-
-    //re-predict all input events between the confirmed state, and our current frame
-    while(inputQueue.Count > 0)
-    {
-        RootNode.RunEvent(inputQueue.Dequeue());
-    }
-    //at this point we've rectified with the server, and are ready for our next input
-}
-```
-
-//TODO how do i transition from that to enterExit Events
-
-In Addition to typical Enter and Exit delegates that trigger when the HSM transitions, extra delegates specific to network contexts can also be pretty useful. 
+## Machine Transition Delegates
+In a typical HSM implementation, you'll have Enter and Exit delegates that trigger any time the machine transitions. These are still important in a Networked HSM, but more specific delegates for network contexts can also be pretty useful. 
 - **Enter/Exit due to deserialization** - allows for ignoring effects that get published in other ways
 - **Enter/Exit from predicted events** - allows for ignoring effects that can't be predicted
 
