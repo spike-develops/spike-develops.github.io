@@ -17,7 +17,7 @@ tags:
 
 Hierarchical State Machines are a spin on finite state machines, where you can be in multiple states within a tree-like *Hierarchy* at any givin time. For a brief overview of FSM's and their hierarchical counterparts, you can't go wrong with [Game Programming Patterns.](https://gameprogrammingpatterns.com/state.html)
 
-In Cult, I used HSM's to describe all actor behaviour that required anything more than single nested conditional logic. IE, Doors, with just a state of Locked/Unlocked used our NetState system outright, while torches, with behaviour like ticked glows and time queued "burns", was described using an HSM
+In Cult of Personality, I used HSM's to describe all actor behaviour that required anything more than single nested conditional logic. IE, Doors, with just a state of Locked/Unlocked used our NetState system outright, while torches, with behaviour like ticked glows and time queued "burns", was described using an HSM
 
 <figure>
     <a href="/assets/files/HSM/TorchHSM.png"><img src="/assets/files/HSM/TorchHSM.png"></a>
@@ -32,7 +32,7 @@ code shown omits things like input sanitization for readability. In a production
 {: .notice}
 
 ## Serialization
-In all games there are certain conditions an actor may be in at any given time. Here's a few from Cult:
+In all games there are certain conditions an actor may be in at any given time. Here's a few from CoP:
 * **Moving**
 * **Sneaking**
 * **interacting**
@@ -78,10 +78,10 @@ int SerNode(int depthMul = 1)
 
 <figure>
     <a href="/assets/files/HSM/PlayerSelections.png"><img src="/assets/files/HSM/PlayerSelections.png"></a>
-    <figcaption>Worst-case header size for the Player HSM in Cult</figcaption>
+    <figcaption>Worst-case header size for the Player HSM in CoP</figcaption>
 </figure>
 
-For Cult's HSM's the worst-case sits below 2 bytes. These limits are also per HSM, so a smaller HSM's header requirements can come in under a byte pretty frequently.
+For CoP HSM's the worst-case sits below 2 bytes. These limits are also per HSM, so a smaller HSM's header requirements can come in under a byte pretty frequently.
 
 To deserialize, we walk back down the tree using the header to decode the next child index as we go.
 ```cs
@@ -170,7 +170,7 @@ If you can ensure that each node in the HSM only ever has one parent, (and there
     <a href="/assets/files/HSM/LeafSelections.png"><img src="/assets/files/HSM/LeafSelections.png"></a>
     <figcaption>max header for player HSM using leaf index</figcaption>
 </figure>
-This can be a pretty significant size-reduction! For Cult's Player HSM we halve our bit requirement, and would need to more-than-double the size of the HSM before we'd need a second byte.
+This can be a pretty significant size-reduction! For CoP's Player HSM we halve our bit requirement, and would need to more-than-double the size of the HSM before we'd need a second byte.
 
 The first step to this technique is doing a bit of pre-processing to actually "index" all the possible leaves.
 During Init, we'll start with a depth-first tree traversal.

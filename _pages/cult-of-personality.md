@@ -35,7 +35,16 @@ possessed_gallery:
     title: "Perspective of the possessed player"
 
 
-feature_row:
+hsm_article:
+  - image_path: /assets/files/HSM/TorchHSM.png
+    alt: "Torch HSM"
+    title: "Networked HSMs"
+    
+    url: /articles/networked-hsms/
+    btn_label: "Read Article"
+    btn_class: "btn--primary"
+
+spelunky_article:
   - image_path: /assets/files/SpelunkyCam/SpelunkyExampleComplete.gif
     alt: "Spelunky Transition Gif"
     title: "Floor Transition System"
@@ -86,6 +95,7 @@ All that factored into my decision to represent actor state with Hierarchical St
 
 ## Technical Articles
 More in-depth articles about some techniques I used in CoP!
-{% include feature_row type="left" %}
+{% include feature_row id="hsm_article" type="left" %}
+{% include feature_row id="spelunky_article" type="left" %}
 
 
